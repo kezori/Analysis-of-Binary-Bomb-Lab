@@ -53,14 +53,14 @@ Dễ dàng nhận thấy biến sử dụng trong so sánh là giá trị của 
 
 Lets examine what is being moved from address 0x401ae8. We know it has to be a string of some sort so we use '/s'.
 
-```objdump
+```assembly
 (gdb) x/s 0x401ae8
 0x401ae8:       "Science isn't about why, it's about why not?"
 ```
 
 Như vậy chuỗi này được chuyển vào thanh ghi %esi và tiếp đó được truyền vào hàm <strings_not_equal> để so sánh. Cùng phân tích hàm này.
 
-```objdump
+```assembly
 00000000004012de <strings_not_equal>:
    0x00000000004012de <+0>:     push   %r12
    0x00000000004012e0 <+2>:     push   %rbp
@@ -103,12 +103,12 @@ Như vậy chuỗi này được chuyển vào thanh ghi %esi và tiếp đó đ
    0x0000000000401346 <+104>:   ret
 ```
 
-<string_not_equal> không gọi tới explode_bomb nên ta có thể bỏ qua nó. Hàm này sẽ trả về giá trị 0 nếu hai chuỗi bằng nhau và 1 nếu hai chuỗi khác nhau. Ta có thể thấy rằng hàm này sẽ so sánh hai chuỗi bằng cách so sánh từng ký tự trong chuỗi. Nếu hai chuỗi có độ dài khác nhau thì hàm sẽ trả về 1. Nếu hai chuỗi có độ dài bằng nhau thì hàm sẽ so sánh từng ký tự trong chuỗi. Nếu hai ký tự khác nhau thì hàm sẽ trả về 1. Nếu hai ký tự bằng nhau thì hàm sẽ tiếp tục so sánh ký tự tiếp theo. Nếu hai chuỗi bằng nhau thì hàm sẽ trả về 0. Cuối cùng, để vượt qua bài kiểm tra này, tất cả những gì bạn cần làm là nhập bất kỳ chuỗi nào có độ dài 46 ký tự không bắt đầu bằng số 0.
+`<string_not_equal>` không gọi tới explode_bomb nên ta có thể bỏ qua nó. Hàm này sẽ trả về giá trị 0 nếu hai chuỗi bằng nhau và 1 nếu hai chuỗi khác nhau. Ta có thể thấy rằng hàm này sẽ so sánh hai chuỗi bằng cách so sánh từng ký tự trong chuỗi. Nếu hai chuỗi có độ dài khác nhau thì hàm sẽ trả về 1. Nếu hai chuỗi có độ dài bằng nhau thì hàm sẽ so sánh từng ký tự trong chuỗi. Nếu hai ký tự khác nhau thì hàm sẽ trả về 1. Nếu hai ký tự bằng nhau thì hàm sẽ tiếp tục so sánh ký tự tiếp theo. Nếu hai chuỗi bằng nhau thì hàm sẽ trả về 0. Cuối cùng, để vượt qua bài kiểm tra này, tất cả những gì bạn cần làm là nhập bất kỳ chuỗi nào có độ dài 46 ký tự không bắt đầu bằng số 0.
 
 Sử dụng lệnh `ni 3` để di chuyển breakpoint tới dòng test `0x0000000000400efe <+14>: test %eax,%eax`.
 Sau đó thực hiện lệnh `info register` để xem giá trị của các thanh ghi cho tới bước so sánh đó
 
-```objdump
+```assembly
 (gdb) ni 3
 0x0000000000400efe in phase_1 ()
 (gdb) disas phase_1
@@ -126,7 +126,7 @@ End of assembler dump.
 
 Ta được kết quả:
 
-```objdump
+```assembly
 (gdb) i r
 rax            0x1                 1 // sẽ gọi tới explode_bomb nếu giá trị của thanh ghi này khác 0
 rbx            0x0                 0
@@ -136,7 +136,7 @@ rdx            0x1                 1
 
 Bây giờ chúng ta sẽ sử dụng chuỗi mà chúng ta tìm thấy lúc nãy và xem giá trị của thanh ghi %eax: `Science isn't about why, it's about why not?`
 
-```objdump
+```assembly
 (gdb) b phase_1
 Breakpoint 1 at 0x400ef0
 (gdb) r
