@@ -8,11 +8,11 @@ Please feel free to fork or star if helpful! (^^ゞ
 
 ```
 
-_The article is referenced from: [https://john.coffee/pages/binary-bomb-lab](https://john.coffee/pages/binary-bomb-lab)_
+_The article is referenced from: [https:;john.coffee/pages/binary-bomb-lab](https:;john.coffee/pages/binary-bomb-lab)_
 
 ## Overview / Tổng quan về giải bomb
 
-Read in this [post](https://github.com/kr4zym3nvn/Analysis-of-Binary-Bomb-Lab/blob/master/Analysis%20of%20CME%20bomb%20lab%20program.md)
+Read in this [post](https:;github.com/kr4zym3nvn/Analysis-of-Binary-Bomb-Lab/blob/master/Analysis%20of%20CME%20bomb%20lab%20program.md)
 
 ## Getting Strings and Objdump
 
@@ -33,12 +33,12 @@ _Bây giờ chúng ta sẽ có 2 tệp strings.txt và assembly.txt. Bây giờ 
 
 ```assembly
 0000000000400ef0 <phase_1>:
-=> 0x0000000000400ef0 <+0>:     sub    $0x8,%rsp // building stack frame with 8 more bytes
-   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi // what is this being moved to esi? (0x401ae8)
-   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal> // call strings_not_equal function
-   0x0000000000400efe <+14>:    test   %eax,%eax // test eax register
-   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23> // jump if equal
-   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb> // call explode_bomb function
+=> 0x0000000000400ef0 <+0>:     sub    $0x8,%rsp ; building stack frame with 8 more bytes
+   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi ; what is this being moved to esi? (0x401ae8)
+   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal> ; call strings_not_equal function
+   0x0000000000400efe <+14>:    test   %eax,%eax ; test eax register
+   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23> ; jump if equal
+   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb> ; call explode_bomb function
    0x0000000000400f07 <+23>:    add    $0x8,%rsp
    0x0000000000400f0b <+27>:    ret
 ```
@@ -128,7 +128,7 @@ Ta được kết quả:
 
 ```assembly
 (gdb) i r
-rax            0x1                 1 // sẽ gọi tới explode_bomb nếu giá trị của thanh ghi này khác 0
+rax            0x1                 1 ; sẽ gọi tới explode_bomb nếu giá trị của thanh ghi này khác 0
 rbx            0x0                 0
 rcx            0x3                 3
 rdx            0x1                 1
@@ -162,7 +162,7 @@ End of assembler dump.
 (gdb) ni 3
 0x0000000000400efe in phase_1 ()
 (gdb) i r
-rax            0x0                 0 // giá trị của thanh ghi này bằng 0 nên sẽ không gọi tới (jump pass) explode_bomb
+rax            0x0                 0 ; giá trị của thanh ghi này bằng 0 nên sẽ không gọi tới (jump pass) explode_bomb
 rbx            0x0                 0
 rcx            0x2c                44
 rdx            0x0                 0
@@ -172,36 +172,36 @@ Vậy lời giải cho Phase 1 là `Science isn't about why, it's about why not?
 
 ## Phase 2:
 
-```objdump
-0000000000400f0c <phase_2>:
-  400f0c:	41 55                	push   %r13
-  400f0e:	41 54                	push   %r12
-  400f10:	55                   	push   %rbp
-  400f11:	53                   	push   %rbx
-  400f12:	48 83 ec 28          	sub    $0x28,%rsp
-  400f16:	48 89 e6             	mov    %rsp,%rsi
-  400f19:	e8 b7 07 00 00       	call   4016d5 <read_six_numbers>
-  400f1e:	48 89 e3             	mov    %rsp,%rbx
-  400f21:	4c 8d 6c 24 0c       	lea    0xc(%rsp),%r13
-  400f26:	bd 00 00 00 00       	mov    $0x0,%ebp
-  400f2b:	49 89 dc             	mov    %rbx,%r12
-  400f2e:	8b 43 0c             	mov    0xc(%rbx),%eax
-  400f31:	39 03                	cmp    %eax,(%rbx)
-  400f33:	74 05                	je     400f3a <phase_2+0x2e>
-  400f35:	e8 79 07 00 00       	call   4016b3 <explode_bomb>
-  400f3a:	41 03 2c 24          	add    (%r12),%ebp
-  400f3e:	48 83 c3 04          	add    $0x4,%rbx
-  400f42:	4c 39 eb             	cmp    %r13,%rbx
-  400f45:	75 e4                	jne    400f2b <phase_2+0x1f>
-  400f47:	85 ed                	test   %ebp,%ebp
-  400f49:	75 05                	jne    400f50 <phase_2+0x44>
-  400f4b:	e8 63 07 00 00       	call   4016b3 <explode_bomb>
-  400f50:	48 83 c4 28          	add    $0x28,%rsp
-  400f54:	5b                   	pop    %rbx
-  400f55:	5d                   	pop    %rbp
-  400f56:	41 5c                	pop    %r12
-  400f58:	41 5d                	pop    %r13
-  400f5a:	c3                   	ret
+```assembly
+Dump of assembler code for function phase_2:
+   0x0000000000400f0c <+0>:     push   %r13
+   0x0000000000400f0e <+2>:     push   %r12
+   0x0000000000400f10 <+4>:     push   %rbp
+   0x0000000000400f11 <+5>:     push   %rbx
+   0x0000000000400f12 <+6>:     sub    $0x28,%rsp ; mở rộng ngăn xếp 56 bytes tương đương với 14 ngăn xếp 4 bytes
+   0x0000000000400f16 <+10>:    mov    %rsp,%rsi ; lưu địa chỉ của thanh ghi %rsp vào thanh ghi %rsi
+   0x0000000000400f19 <+13>:    call   0x4016d5 <read_six_numbers> ; Chúng ta có thể thấy
+   0x0000000000400f1e <+18>:    mov    %rsp,%rbx ; lưu địa chỉ của thanh ghi %rsp vào thanh ghi %rbx
+   0x0000000000400f21 <+21>:    lea    0xc(%rsp),%r13 ; lưu giá trị của thanh ghi %rsp + 12 vào thanh ghi %r13
+   0x0000000000400f26 <+26>:    mov    $0x0,%ebp ; lưu giá trị 0 vào thanh ghi %ebp
+   0x0000000000400f2b <+31>:    mov    %rbx,%r12 ; lưu giá trị của thanh ghi %rbx vào thanh ghi %r12
+   0x0000000000400f2e <+34>:    mov    0xc(%rbx),%eax ; lưu giá trị của thanh ghi %rbx + 12 vào thanh ghi %eax
+   0x0000000000400f31 <+37>:    cmp    %eax,(%rbx) ; so sánh giá trị của thanh ghi %rbx + 12 với giá trị của thanh ghi %rbx
+   0x0000000000400f33 <+39>:    je     0x400f3a <phase_2+46> ; nếu giá trị của thanh ghi %rbx + 12 bằng giá trị của thanh ghi %rbx thì nhảy tới 0x400f3a
+   0x0000000000400f35 <+41>:    call   0x4016b3 <explode_bomb> ; gọi hàm explode_bomb
+   0x0000000000400f3a <+46>:    add    (%r12),%ebp ; cộng giá trị của thanh ghi %r12 với giá trị của thanh ghi %ebp
+   0x0000000000400f3e <+50>:    add    $0x4,%rbx ; cộng giá trị của thanh ghi %rbx + 4
+   0x0000000000400f42 <+54>:    cmp    %r13,%rbx ; so sánh giá trị của thanh ghi %r13 với giá trị của thanh ghi %rbx
+   0x0000000000400f45 <+57>:    jne    0x400f2b <phase_2+31> ; nếu giá trị của thanh ghi %r13 khác giá trị của thanh ghi %rbx thì nhảy tới 0x400f2b
+   0x0000000000400f47 <+59>:    test   %ebp,%ebp ; so sánh giá trị của thanh ghi %ebp với giá trị của thanh ghi %ebp
+   0x0000000000400f49 <+61>:    jne    0x400f50 <phase_2+68> ; nếu giá trị của thanh ghi %ebp khác giá trị của thanh ghi %ebp thì nhảy tới 0x400f50
+   0x0000000000400f4b <+63>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f50 <+68>:    add    $0x28,%rsp ;
+   0x0000000000400f54 <+72>:    pop    %rbx
+   0x0000000000400f55 <+73>:    pop    %rbp
+   0x0000000000400f56 <+74>:    pop    %r12
+   0x0000000000400f58 <+76>:    pop    %r13
+   0x0000000000400f5a <+78>:    ret
 ```
 
 ## Phase 3:
