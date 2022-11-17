@@ -48,6 +48,17 @@ _Vietnamese is below_
   400f0b:	c3                   	ret
 ```
 
+```assembly
+=> 0x0000000000400ef0 <+0>:     sub    $0x8,%rsp
+   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi
+   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal>
+   0x0000000000400efe <+14>:    test   %eax,%eax
+   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23>
+   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f07 <+23>:    add    $0x8,%rsp
+   0x0000000000400f0b <+27>:    ret
+```
+
 Chúng ta có thể thấy rằng hàm <strings_not_equal> đang được gọi với hàm ý so sánh hai chuỗi.
 Việc đầu tiên là cần xác định được bối cảnh thủ tục hay chính là các biến được truyền vào hàm là gì.
 Dễ dàng nhận thấy biến sử dụng trong so sánh là giá trị của địa chỉ lưu trong thanh ghi $eax. Ngay trước khi gọi hàm, ở trên có xuất hiện thanh ghi $esi cũng liên quan. Ta sử dụng địa chỉ đó trong bộ nhớ và xem nó chứa gì dưới dạng chuỗi.
@@ -62,6 +73,51 @@ Lets examine what is being moved from address 0x401ae8. We know it has to be a s
 (gdb) x/s 0x401ae8
 0x401ae8:       "Science isn't about why, it's about why not?"
 ```
+
+Như vậy chuỗi này được chuyển vào thanh ghi %esi và tiếp đó được truyền vào hàm <strings_not_equal> để so sánh. Cùng phân tích hàm này.
+
+````objdump
+00000000004012de <strings_not_equal>:
+  4012de:	41 54                	push   %r12
+  4012e0:	55                   	push   %rbp
+  4012e1:	53                   	push   %rbx
+  4012e2:	48 89 fb             	mov    %rdi,%rbx
+  4012e5:	48 89 f5             	mov    %rsi,%rbp
+  4012e8:	e8 d4 ff ff ff       	call   4012c1 <string_length>
+  4012ed:	41 89 c4             	mov    %eax,%r12d
+  4012f0:	48 89 ef             	mov    %rbp,%rdi
+  4012f3:	e8 c9 ff ff ff       	call   4012c1 <string_length>
+  4012f8:	ba 01 00 00 00       	mov    $0x1,%edx
+  4012fd:	41 39 c4             	cmp    %eax,%r12d
+  401300:	75 3e                	jne    401340 <strings_not_equal+0x62>
+  401302:	0f b6 03             	movzbl (%rbx),%eax
+  401305:	84 c0                	test   %al,%al
+  401307:	74 24                	je     40132d <strings_not_equal+0x4f>
+  401309:	3a 45 00             	cmp    0x0(%rbp),%al
+  40130c:	74 09                	je     401317 <strings_not_equal+0x39>
+  40130e:	66 90                	xchg   %ax,%ax
+  401310:	eb 22                	jmp    401334 <strings_not_equal+0x56>
+  401312:	3a 45 00             	cmp    0x0(%rbp),%al
+  401315:	75 24                	jne    40133b <strings_not_equal+0x5d>
+  401317:	48 83 c3 01          	add    $0x1,%rbx
+  40131b:	48 83 c5 01          	add    $0x1,%rbp
+  40131f:	0f b6 03             	movzbl (%rbx),%eax
+  401322:	84 c0                	test   %al,%al
+  401324:	75 ec                	jne    401312 <strings_not_equal+0x34>
+  401326:	ba 00 00 00 00       	mov    $0x0,%edx
+  40132b:	eb 13                	jmp    401340 <strings_not_equal+0x62>
+  40132d:	ba 00 00 00 00       	mov    $0x0,%edx
+  401332:	eb 0c                	jmp    401340 <strings_not_equal+0x62>
+  401334:	ba 01 00 00 00       	mov    $0x1,%edx
+  401339:	eb 05                	jmp    401340 <strings_not_equal+0x62>
+  40133b:	ba 01 00 00 00       	mov    $0x1,%edx
+  401340:	89 d0                	mov    %edx,%eax
+  401342:	5b                   	pop    %rbx
+  401343:	5d                   	pop    %rbp
+  401344:	41 5c                	pop    %r12
+  401346:	c3                   	ret
+```
+<string_not_equal> không gọi tới explode_bomb nên ta có thể bỏ qua nó. Hàm này sẽ trả về giá trị 0 nếu hai chuỗi bằng nhau và 1 nếu hai chuỗi khác nhau. Ta có thể thấy rằng hàm này sẽ so sánh hai chuỗi bằng cách so sánh từng ký tự trong chuỗi. Nếu hai chuỗi có độ dài khác nhau thì hàm sẽ trả về 1. Nếu hai chuỗi có độ dài bằng nhau thì hàm sẽ so sánh từng ký tự trong chuỗi. Nếu hai ký tự khác nhau thì hàm sẽ trả về 1. Nếu hai ký tự bằng nhau thì hàm sẽ tiếp tục so sánh ký tự tiếp theo. Nếu hai chuỗi bằng nhau thì hàm sẽ trả về 0.
 
 ## Phase 2:
 
@@ -95,7 +151,7 @@ Lets examine what is being moved from address 0x401ae8. We know it has to be a s
   400f56:	41 5c                	pop    %r12
   400f58:	41 5d                	pop    %r13
   400f5a:	c3                   	ret
-```
+````
 
 ## Phase 3:
 
