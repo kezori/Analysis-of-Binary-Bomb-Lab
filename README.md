@@ -1,4 +1,4 @@
-# Analysis of Binary Bomb Lab / Giải bomb nhị phân (Môn kiến trúc máy tính)
+# Analysis of A Binary Bomb Lab / Giải bomb nhị phân (Môn kiến trúc máy tính)
 
 _The article is referenced from: [https://john.coffee/pages/binary-bomb-lab](https://john.coffee/pages/binary-bomb-lab)_
 
@@ -6,7 +6,7 @@ _The article is referenced from: [https://john.coffee/pages/binary-bomb-lab](htt
 
 Run the following commands to create text files which we will look at later:
 
-Chạy các dòng lệnh sau để tạo file text mà chúng ta sẽ cần sau này
+_Chạy các dòng lệnh sau để tạo file text mà chúng ta sẽ cần sau này_
 
 ```
 strings bomb > strings.txt
@@ -14,6 +14,10 @@ objdump -d bomb > assembly.txt
 ```
 
 You should now have two files: strings.txt and assembly.txt. Now let’s get started with Phase 1!
+
+_Bây giờ chúng ta sẽ có 2 tệp strings.txt và assembly.txt. Bây giờ chúng ta sẽ bắt đầu với Phase 1!_
+
+## Overview / Tổng quan về giải bomb
 
 ## Phase 1:
 
@@ -31,7 +35,7 @@ You should now have two files: strings.txt and assembly.txt. Now let’s get sta
 
 ## Phase 2:
 
-```objdumb
+```objdump
 0000000000400f0c <phase_2>:
   400f0c:	41 55                	push   %r13
   400f0e:	41 54                	push   %r12
