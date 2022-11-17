@@ -1,7 +1,7 @@
 ## Analysis of CME bomb lab program in linux using dbg, objdump, and strings
 
-Created by: [MarkHyphen](https://github.com/MarkHyphen)
-Soucre: https://github.com/MarkHyphen/Bomb_Lab/blob/master/Analysis.md
+Created by: _[MarkHyphen](https://github.com/MarkHyphen)_
+Soucre: *https://github.com/MarkHyphen/Bomb_Lab/blob/master/Analysis.md*
 
 ### Basic Static Analysis
 

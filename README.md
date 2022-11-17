@@ -1,6 +1,21 @@
-# Analysis of A Binary Bomb Lab / Giải bomb nhị phân (Môn kiến trúc máy tính)
+# Analysis of A Binary Bomb Lab / Giải bomb nhị phân
+
+## Thang Long University - Computer Architecture - CS212 - Semester I/2022
+
+```
+Thực hiện trong kì thi cuối kì môn Kiến trúc máy tính - CS212 - Kì I/2022 được tham khảo từ nhiều tài liệu có ghi nguồn.
+Tặng sao nếu thấy hữu ích nhe (^^ゞ
+
+Performed in the final exam of Computer Architecture - CS212 - Semester I/2022 - Thang Long University with references from many sources attested.
+Please feel free to fork or star if helpful! (^^ゞ
+
+```
 
 _The article is referenced from: [https://john.coffee/pages/binary-bomb-lab](https://john.coffee/pages/binary-bomb-lab)_
+
+## Overview / Tổng quan về giải bomb
+
+Read in this [post](https://github.com/kr4zym3nvn/Analysis-of-Binary-Bomb-Lab/blob/master/Analysis%20of%20CME%20bomb%20lab%20program.md)
 
 ## Getting Strings and Objdump
 
@@ -17,20 +32,35 @@ You should now have two files: strings.txt and assembly.txt. Now let’s get sta
 
 _Bây giờ chúng ta sẽ có 2 tệp strings.txt và assembly.txt. Bây giờ chúng ta sẽ bắt đầu với Phase 1!_
 
-## Overview / Tổng quan về giải bomb
+_Vietnamese is below_
 
 ## Phase 1:
 
 ```objdump
 0000000000400ef0 <phase_1>:
-  400ef0:	48 83 ec 08          	sub    $0x8,%rsp
-  400ef4:	be e8 1a 40 00       	mov    $0x401ae8,%esi
-  400ef9:	e8 e0 03 00 00       	call   4012de <strings_not_equal>
-  400efe:	85 c0                	test   %eax,%eax
-  400f00:	74 05                	je     400f07 <phase_1+0x17>
-  400f02:	e8 ac 07 00 00       	call   4016b3 <explode_bomb>
-  400f07:	48 83 c4 08          	add    $0x8,%rsp
+  400ef0:	48 83 ec 08          	sub    $0x8,%rsp // building stack frame with 8 more bytes
+  400ef4:	be e8 1a 40 00       	mov    $0x401ae8,%esi // what is this being moved to esi? (0x401ae8)
+  400ef9:	e8 e0 03 00 00       	call   4012de <strings_not_equal> // call strings_not_equal function
+  400efe:	85 c0                	test   %eax,%eax // test eax register
+  400f00:	74 05                	je     400f07 <phase_1+0x17> // jump if equal
+  400f02:	e8 ac 07 00 00       	call   4016b3 <explode_bomb> // call explode_bomb function
+  400f07:	48 83 c4 08          	add    $0x8,%rsp // add 8 bytes to stack frame
   400f0b:	c3                   	ret
+```
+
+Chúng ta có thể thấy rằng hàm <strings_not_equal> đang được gọi với hàm ý so sánh hai chuỗi.
+Việc đầu tiên là cần xác định được bối cảnh thủ tục hay chính là các biến được truyền vào hàm là gì.
+Dễ dàng nhận thấy biến sử dụng trong so sánh là giá trị của địa chỉ lưu trong thanh ghi $eax. Ngay trước khi gọi hàm, ở trên có xuất hiện thanh ghi $esi cũng liên quan. Ta sử dụng địa chỉ đó trong bộ nhớ và xem nó chứa gì dưới dạng chuỗi.
+
+    ```objdump
+    400ef4:	be e8 1a 40 00       	mov    $0x401ae8,%esi
+    ```
+
+Lets examine what is being moved from address 0x401ae8. We know it has to be a string of some sort so we use '/s'.
+
+```objdump
+(gdb) x/s 0x401ae8
+0x401ae8:       "Science isn't about why, it's about why not?"
 ```
 
 ## Phase 2:
