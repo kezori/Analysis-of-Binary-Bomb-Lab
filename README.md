@@ -3,10 +3,7 @@
 ## Thang Long University - Computer Architecture - CS212 - Semester I/2022
 
 ```
-Thực hiện trong kì thi cuối kì môn Kiến trúc máy tính - CS212 - Kì I/2022 được tham khảo từ nhiều tài liệu có ghi nguồn.
-Tặng sao nếu thấy hữu ích nhe (^^ゞ
-
-Performed in the final exam of Computer Architecture - CS212 - Semester I/2022 - Thang Long University with references from many sources attested.
+Start working on 11/17/2022 - During the period of the final exam of the first term in 2022
 Please feel free to fork or star if helpful! (^^ゞ
 
 ```
@@ -63,7 +60,7 @@ Lets examine what is being moved from address 0x401ae8. We know it has to be a s
 
 Như vậy chuỗi này được chuyển vào thanh ghi %esi và tiếp đó được truyền vào hàm <strings_not_equal> để so sánh. Cùng phân tích hàm này.
 
-````objdump
+```objdump
 00000000004012de <strings_not_equal>:
    0x00000000004012de <+0>:     push   %r12
    0x00000000004012e0 <+2>:     push   %rbp
@@ -105,10 +102,12 @@ Như vậy chuỗi này được chuyển vào thanh ghi %esi và tiếp đó đ
    0x0000000000401344 <+102>:   pop    %r12
    0x0000000000401346 <+104>:   ret
 ```
+
 <string_not_equal> không gọi tới explode_bomb nên ta có thể bỏ qua nó. Hàm này sẽ trả về giá trị 0 nếu hai chuỗi bằng nhau và 1 nếu hai chuỗi khác nhau. Ta có thể thấy rằng hàm này sẽ so sánh hai chuỗi bằng cách so sánh từng ký tự trong chuỗi. Nếu hai chuỗi có độ dài khác nhau thì hàm sẽ trả về 1. Nếu hai chuỗi có độ dài bằng nhau thì hàm sẽ so sánh từng ký tự trong chuỗi. Nếu hai ký tự khác nhau thì hàm sẽ trả về 1. Nếu hai ký tự bằng nhau thì hàm sẽ tiếp tục so sánh ký tự tiếp theo. Nếu hai chuỗi bằng nhau thì hàm sẽ trả về 0. Cuối cùng, để vượt qua bài kiểm tra này, tất cả những gì bạn cần làm là nhập bất kỳ chuỗi nào có độ dài 46 ký tự không bắt đầu bằng số 0.
 
-Sử dụng lệnh `ni 3` để di chuyển breakpoint tới dòng test `0x0000000000400efe <+14>:    test   %eax,%eax`.
+Sử dụng lệnh `ni 3` để di chuyển breakpoint tới dòng test `0x0000000000400efe <+14>: test %eax,%eax`.
 Sau đó thực hiện lệnh `info register` để xem giá trị của các thanh ghi cho tới bước so sánh đó
+
 ```objdump
 (gdb) ni 3
 0x0000000000400efe in phase_1 ()
@@ -124,7 +123,9 @@ Dump of assembler code for function phase_1:
    0x0000000000400f0b <+27>:    ret
 End of assembler dump.
 ```
+
 Ta được kết quả:
+
 ```objdump
 (gdb) i r
 rax            0x1                 1 // sẽ gọi tới explode_bomb nếu giá trị của thanh ghi này khác 0
@@ -133,8 +134,7 @@ rcx            0x3                 3
 rdx            0x1                 1
 ```
 
-Bây giờ chúng ta sẽ sử dụng chuỗi mà chúng ta tìm thấy lúc nãy và xem giá trị của thanh ghi %eax:
-`Science isn't about why, it's about why not?`
+Bây giờ chúng ta sẽ sử dụng chuỗi mà chúng ta tìm thấy lúc nãy và xem giá trị của thanh ghi %eax: `Science isn't about why, it's about why not?`
 
 ```objdump
 (gdb) b phase_1
@@ -202,7 +202,7 @@ Vậy lời giải cho Phase 1 là `Science isn't about why, it's about why not?
   400f56:	41 5c                	pop    %r12
   400f58:	41 5d                	pop    %r13
   400f5a:	c3                   	ret
-````
+```
 
 ## Phase 3:
 
