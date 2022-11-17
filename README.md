@@ -32,29 +32,16 @@ You should now have two files: strings.txt and assembly.txt. Now let’s get sta
 
 _Bây giờ chúng ta sẽ có 2 tệp strings.txt và assembly.txt. Bây giờ chúng ta sẽ bắt đầu với Phase 1!_
 
-_Vietnamese is below_
-
 ## Phase 1:
 
-```objdump
-0000000000400ef0 <phase_1>:
-  400ef0:	48 83 ec 08          	sub    $0x8,%rsp // building stack frame with 8 more bytes
-  400ef4:	be e8 1a 40 00       	mov    $0x401ae8,%esi // what is this being moved to esi? (0x401ae8)
-  400ef9:	e8 e0 03 00 00       	call   4012de <strings_not_equal> // call strings_not_equal function
-  400efe:	85 c0                	test   %eax,%eax // test eax register
-  400f00:	74 05                	je     400f07 <phase_1+0x17> // jump if equal
-  400f02:	e8 ac 07 00 00       	call   4016b3 <explode_bomb> // call explode_bomb function
-  400f07:	48 83 c4 08          	add    $0x8,%rsp // add 8 bytes to stack frame
-  400f0b:	c3                   	ret
-```
-
 ```assembly
-=> 0x0000000000400ef0 <+0>:     sub    $0x8,%rsp
-   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi
-   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal>
-   0x0000000000400efe <+14>:    test   %eax,%eax
-   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23>
-   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb>
+0000000000400ef0 <phase_1>:
+=> 0x0000000000400ef0 <+0>:     sub    $0x8,%rsp // building stack frame with 8 more bytes
+   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi // what is this being moved to esi? (0x401ae8)
+   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal> // call strings_not_equal function
+   0x0000000000400efe <+14>:    test   %eax,%eax // test eax register
+   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23> // jump if equal
+   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb> // call explode_bomb function
    0x0000000000400f07 <+23>:    add    $0x8,%rsp
    0x0000000000400f0b <+27>:    ret
 ```
@@ -78,46 +65,110 @@ Như vậy chuỗi này được chuyển vào thanh ghi %esi và tiếp đó đ
 
 ````objdump
 00000000004012de <strings_not_equal>:
-  4012de:	41 54                	push   %r12
-  4012e0:	55                   	push   %rbp
-  4012e1:	53                   	push   %rbx
-  4012e2:	48 89 fb             	mov    %rdi,%rbx
-  4012e5:	48 89 f5             	mov    %rsi,%rbp
-  4012e8:	e8 d4 ff ff ff       	call   4012c1 <string_length>
-  4012ed:	41 89 c4             	mov    %eax,%r12d
-  4012f0:	48 89 ef             	mov    %rbp,%rdi
-  4012f3:	e8 c9 ff ff ff       	call   4012c1 <string_length>
-  4012f8:	ba 01 00 00 00       	mov    $0x1,%edx
-  4012fd:	41 39 c4             	cmp    %eax,%r12d
-  401300:	75 3e                	jne    401340 <strings_not_equal+0x62>
-  401302:	0f b6 03             	movzbl (%rbx),%eax
-  401305:	84 c0                	test   %al,%al
-  401307:	74 24                	je     40132d <strings_not_equal+0x4f>
-  401309:	3a 45 00             	cmp    0x0(%rbp),%al
-  40130c:	74 09                	je     401317 <strings_not_equal+0x39>
-  40130e:	66 90                	xchg   %ax,%ax
-  401310:	eb 22                	jmp    401334 <strings_not_equal+0x56>
-  401312:	3a 45 00             	cmp    0x0(%rbp),%al
-  401315:	75 24                	jne    40133b <strings_not_equal+0x5d>
-  401317:	48 83 c3 01          	add    $0x1,%rbx
-  40131b:	48 83 c5 01          	add    $0x1,%rbp
-  40131f:	0f b6 03             	movzbl (%rbx),%eax
-  401322:	84 c0                	test   %al,%al
-  401324:	75 ec                	jne    401312 <strings_not_equal+0x34>
-  401326:	ba 00 00 00 00       	mov    $0x0,%edx
-  40132b:	eb 13                	jmp    401340 <strings_not_equal+0x62>
-  40132d:	ba 00 00 00 00       	mov    $0x0,%edx
-  401332:	eb 0c                	jmp    401340 <strings_not_equal+0x62>
-  401334:	ba 01 00 00 00       	mov    $0x1,%edx
-  401339:	eb 05                	jmp    401340 <strings_not_equal+0x62>
-  40133b:	ba 01 00 00 00       	mov    $0x1,%edx
-  401340:	89 d0                	mov    %edx,%eax
-  401342:	5b                   	pop    %rbx
-  401343:	5d                   	pop    %rbp
-  401344:	41 5c                	pop    %r12
-  401346:	c3                   	ret
+   0x00000000004012de <+0>:     push   %r12
+   0x00000000004012e0 <+2>:     push   %rbp
+   0x00000000004012e1 <+3>:     push   %rbx
+   0x00000000004012e2 <+4>:     mov    %rdi,%rbx
+   0x00000000004012e5 <+7>:     mov    %rsi,%rbp
+   0x00000000004012e8 <+10>:    call   0x4012c1 <string_length>
+   0x00000000004012ed <+15>:    mov    %eax,%r12d
+   0x00000000004012f0 <+18>:    mov    %rbp,%rdi
+   0x00000000004012f3 <+21>:    call   0x4012c1 <string_length>
+   0x00000000004012f8 <+26>:    mov    $0x1,%edx
+   0x00000000004012fd <+31>:    cmp    %eax,%r12d
+   0x0000000000401300 <+34>:    jne    0x401340 <strings_not_equal+98>
+   0x0000000000401302 <+36>:    movzbl (%rbx),%eax
+   0x0000000000401305 <+39>:    test   %al,%al
+   0x0000000000401307 <+41>:    je     0x40132d <strings_not_equal+79>
+   0x0000000000401309 <+43>:    cmp    0x0(%rbp),%al
+   0x000000000040130c <+46>:    je     0x401317 <strings_not_equal+57>
+   0x000000000040130e <+48>:    xchg   %ax,%ax
+   0x0000000000401310 <+50>:    jmp    0x401334 <strings_not_equal+86>
+   0x0000000000401312 <+52>:    cmp    0x0(%rbp),%al
+   0x0000000000401315 <+55>:    jne    0x40133b <strings_not_equal+93>
+   0x0000000000401317 <+57>:    add    $0x1,%rbx
+   0x000000000040131b <+61>:    add    $0x1,%rbp
+   0x000000000040131f <+65>:    movzbl (%rbx),%eax
+   0x0000000000401322 <+68>:    test   %al,%al
+   0x0000000000401324 <+70>:    jne    0x401312 <strings_not_equal+52>
+   0x0000000000401326 <+72>:    mov    $0x0,%edx
+   0x000000000040132b <+77>:    jmp    0x401340 <strings_not_equal+98>
+--Type <RET> for more, q to quit, c to continue without paging--RET
+   0x000000000040132d <+79>:    mov    $0x0,%edx
+   0x0000000000401332 <+84>:    jmp    0x401340 <strings_not_equal+98>
+   0x0000000000401334 <+86>:    mov    $0x1,%edx
+   0x0000000000401339 <+91>:    jmp    0x401340 <strings_not_equal+98>
+   0x000000000040133b <+93>:    mov    $0x1,%edx
+   0x0000000000401340 <+98>:    mov    %edx,%eax
+   0x0000000000401342 <+100>:   pop    %rbx
+   0x0000000000401343 <+101>:   pop    %rbp
+   0x0000000000401344 <+102>:   pop    %r12
+   0x0000000000401346 <+104>:   ret
 ```
-<string_not_equal> không gọi tới explode_bomb nên ta có thể bỏ qua nó. Hàm này sẽ trả về giá trị 0 nếu hai chuỗi bằng nhau và 1 nếu hai chuỗi khác nhau. Ta có thể thấy rằng hàm này sẽ so sánh hai chuỗi bằng cách so sánh từng ký tự trong chuỗi. Nếu hai chuỗi có độ dài khác nhau thì hàm sẽ trả về 1. Nếu hai chuỗi có độ dài bằng nhau thì hàm sẽ so sánh từng ký tự trong chuỗi. Nếu hai ký tự khác nhau thì hàm sẽ trả về 1. Nếu hai ký tự bằng nhau thì hàm sẽ tiếp tục so sánh ký tự tiếp theo. Nếu hai chuỗi bằng nhau thì hàm sẽ trả về 0.
+<string_not_equal> không gọi tới explode_bomb nên ta có thể bỏ qua nó. Hàm này sẽ trả về giá trị 0 nếu hai chuỗi bằng nhau và 1 nếu hai chuỗi khác nhau. Ta có thể thấy rằng hàm này sẽ so sánh hai chuỗi bằng cách so sánh từng ký tự trong chuỗi. Nếu hai chuỗi có độ dài khác nhau thì hàm sẽ trả về 1. Nếu hai chuỗi có độ dài bằng nhau thì hàm sẽ so sánh từng ký tự trong chuỗi. Nếu hai ký tự khác nhau thì hàm sẽ trả về 1. Nếu hai ký tự bằng nhau thì hàm sẽ tiếp tục so sánh ký tự tiếp theo. Nếu hai chuỗi bằng nhau thì hàm sẽ trả về 0. Cuối cùng, để vượt qua bài kiểm tra này, tất cả những gì bạn cần làm là nhập bất kỳ chuỗi nào có độ dài 46 ký tự không bắt đầu bằng số 0.
+
+Sử dụng lệnh `ni 3` để di chuyển breakpoint tới dòng test `0x0000000000400efe <+14>:    test   %eax,%eax`.
+Sau đó thực hiện lệnh `info register` để xem giá trị của các thanh ghi cho tới bước so sánh đó
+```objdump
+(gdb) ni 3
+0x0000000000400efe in phase_1 ()
+(gdb) disas phase_1
+Dump of assembler code for function phase_1:
+   0x0000000000400ef0 <+0>:     sub    $0x8,%rsp
+   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi
+   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal>
+=> 0x0000000000400efe <+14>:    test   %eax,%eax
+   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23>
+   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f07 <+23>:    add    $0x8,%rsp
+   0x0000000000400f0b <+27>:    ret
+End of assembler dump.
+```
+Ta được kết quả:
+```objdump
+(gdb) i r
+rax            0x1                 1 // sẽ gọi tới explode_bomb nếu giá trị của thanh ghi này khác 0
+rbx            0x0                 0
+rcx            0x3                 3
+rdx            0x1                 1
+```
+
+Bây giờ chúng ta sẽ sử dụng chuỗi mà chúng ta tìm thấy lúc nãy và xem giá trị của thanh ghi %eax:
+`Science isn't about why, it's about why not?`
+
+```objdump
+(gdb) b phase_1
+Breakpoint 1 at 0x400ef0
+(gdb) r
+Starting program: /home/k4zy/ktmt/bomb23/bomb
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Science isn't about why, it's about why not?
+
+Breakpoint 1, 0x0000000000400ef0 in phase_1 ()
+(gdb) disas
+Dump of assembler code for function phase_1:
+=> 0x0000000000400ef0 <+0>:     sub    $0x8,%rsp
+   0x0000000000400ef4 <+4>:     mov    $0x401ae8,%esi
+   0x0000000000400ef9 <+9>:     call   0x4012de <strings_not_equal>
+   0x0000000000400efe <+14>:    test   %eax,%eax
+   0x0000000000400f00 <+16>:    je     0x400f07 <phase_1+23>
+   0x0000000000400f02 <+18>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f07 <+23>:    add    $0x8,%rsp
+   0x0000000000400f0b <+27>:    ret
+End of assembler dump.
+(gdb) ni 3
+0x0000000000400efe in phase_1 ()
+(gdb) i r
+rax            0x0                 0 // giá trị của thanh ghi này bằng 0 nên sẽ không gọi tới (jump pass) explode_bomb
+rbx            0x0                 0
+rcx            0x2c                44
+rdx            0x0                 0
+```
+
+Vậy lời giải cho Phase 1 là `Science isn't about why, it's about why not?`
 
 ## Phase 2:
 
