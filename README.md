@@ -52,9 +52,9 @@ Chúng ta có thể thấy rằng hàm <strings_not_equal> đang được gọi 
 Việc đầu tiên là cần xác định được bối cảnh thủ tục hay chính là các biến được truyền vào hàm là gì.
 Dễ dàng nhận thấy biến sử dụng trong so sánh là giá trị của địa chỉ lưu trong thanh ghi $eax. Ngay trước khi gọi hàm, ở trên có xuất hiện thanh ghi $esi cũng liên quan. Ta sử dụng địa chỉ đó trong bộ nhớ và xem nó chứa gì dưới dạng chuỗi.
 
-    ```objdump
-    400ef4:	be e8 1a 40 00       	mov    $0x401ae8,%esi
-    ```
+```objdump
+400ef4:	be e8 1a 40 00       	mov    $0x401ae8,%esi
+```
 
 Lets examine what is being moved from address 0x401ae8. We know it has to be a string of some sort so we use '/s'.
 
