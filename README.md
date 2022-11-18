@@ -5,12 +5,11 @@
 ```
 Start working on 11/17/2022 - During the period of the final exam of the first term in 2022
 Please feel free to fork or star if helpful! (^^ゞ
-A41316 - Nguyễn Hữu Khoa
+Created by: A41316 - Nguyễn Hữu Khoa
 ```
 
 _The article is referenced from:_
 
-- [john.coffee/pages/binary-bomb-lab](https:://john.coffee/pages/binary-bomb-lab)
 - [https://github.com/sc2225/Bomb-Lab](https://github.com/sc2225/Bomb-Lab)
 
 ## Overview / Tổng quan về giải bomb
@@ -313,9 +312,13 @@ Chúng ta kiểm tra giá trị tại địa chỉ lưu trong thanh ghi rbx là 
 Ta có 2 kết luận:
 
 - Giá trị của thanh ghi %eax hay chính là giá trị của thanh ghi %rbx + 0xc bằng 4, vậy tức là số thứ 4 nhập có địa chỉ nằm tại thanh ghi %rbx + 0xc
-  `0x0000000000400f2e <+34>: mov 0xc(%rbx),%eax`
+  ```assembly
+  0x0000000000400f2e <+34>: mov 0xc(%rbx),%eax
+  ```
 - Giá trị thanh ghi %rbx bằng 1 => thanh ghi %rsp lưu địa chỉ có giá trị số thứ 1 ta nhập vào
-  `0x0000000000400f1e <+18>: mov %rsp,%rbx`
+  ```assembly
+  0x0000000000400f1e <+18>: mov %rsp,%rbx
+  ```
 
 So sánh 2 số thứ 1 và 4 nhập vào nếu không bằng nhau sẽ nổ bom
 
@@ -343,29 +346,45 @@ Ta tiếp tục kiểm tra các dòng hợp ngữ phía sau:
    0x0000000000400f5a <+78>:    ret
 ```
 
-`0x0000000000400f3e <+50>: add $0x4,%rbx`
+```assembly
+0x0000000000400f3e <+50>: add $0x4,%rbx
+```
+
 Địa chỉ thanh ghi %rbx được tăng thêm 4, chuyển tới trỏ vào ngăn xếp chứa giá trị thứ 2 được nhập vào
 
-`0x0000000000400f42 <+54>: cmp %r13,%rbx`
+```assembly
+0x0000000000400f42 <+54>: cmp %r13,%rbx
+```
+
 Ta thấy số thứ 2 được so sánh với giá trị tại ô nhớ lưu ở %r13 hay chính là địa chỉ của ô nhớ %rsp + 0xc (+12 / tương đương 3 hàng, từ việc trỏ tới hàng thứ nhất di chuyển qua trỏ hàng thứ 4 trong ngăn xếp) (số thứ 4 nhập vào)
 
+```assembly
+0x0000000000400f45 <+57>: jne 0x400f2b <phase_2+31>
+```
+
 So sánh 2 số thứ 2 và 4 nhập vào nếu không bằng nhau sẽ nhảy tới dòng 31
-`0x0000000000400f45 <+57>: jne 0x400f2b <phase_2+31>`
 
 ```assembly
    0x0000000000400f2b <+31>:    mov    %rbx,%r12 ; chuyển giá trị số thứ 2 vào thanh ghi %r12
-   0x0000000000400f2e <+34>:    mov    0xc(%rbx),%eax
-   0x0000000000400f31 <+37>:    cmp    %eax,(%rbx)
 ```
 
-`0x0000000000400f2e <+34>: mov 0xc(%rbx),%eax`
+```assembly
+0x0000000000400f2e <+34>: mov 0xc(%rbx),%eax
+```
+
 Di chuyển giá trị tại địa chỉ %rbx + 0xc (tương đương số thứ 5 nhập vào vì %rbx đang chứa địa chỉ trỏ vào số thứ 2) vào thanh ghi %eax
 
-`0x0000000000400f31 <+37>: cmp %eax,(%rbx)`
+```assembly
+0x0000000000400f31 <+37>: cmp %eax,(%rbx)
+```
+
 Lúc này so sánh giá trị tại 2 thanh ghi %eax và %rbx (tương đương số thứ 5 và số thứ 2 nhập vào)
 
+```assembly
+0x0000000000400f33 <+39>: je 0x400f3a <phase_2+46>
+```
+
 So sánh giá trị, nếu bằng sẽ nhảy tới dòng 46
-`0x0000000000400f33 <+39>: je 0x400f3a <phase_2+46>`
 
 ```assembly
    0x0000000000400f3a <+46>:    add    (%r12),%ebp
@@ -395,53 +414,110 @@ That's number 2.  Keep going!
 
 ## Phase 3:
 
-```objdump
-0000000000400f5b <phase_3>:
-  400f5b:	48 83 ec 18          	sub    $0x18,%rsp
-  400f5f:	48 8d 4c 24 08       	lea    0x8(%rsp),%rcx
-  400f64:	48 8d 54 24 0c       	lea    0xc(%rsp),%rdx
-  400f69:	be 3a 1e 40 00       	mov    $0x401e3a,%esi
-  400f6e:	b8 00 00 00 00       	mov    $0x0,%eax
-  400f73:	e8 88 fc ff ff       	call   400c00 <__isoc99_sscanf@plt>
-  400f78:	83 f8 01             	cmp    $0x1,%eax
-  400f7b:	7f 05                	jg     400f82 <phase_3+0x27>
-  400f7d:	e8 31 07 00 00       	call   4016b3 <explode_bomb>
-  400f82:	83 7c 24 0c 07       	cmpl   $0x7,0xc(%rsp)
-  400f87:	77 64                	ja     400fed <phase_3+0x92>
-  400f89:	8b 44 24 0c          	mov    0xc(%rsp),%eax
-  400f8d:	ff 24 c5 50 1b 40 00 	jmp    *0x401b50(,%rax,8)
-  400f94:	b8 00 00 00 00       	mov    $0x0,%eax
-  400f99:	eb 05                	jmp    400fa0 <phase_3+0x45>
-  400f9b:	b8 76 03 00 00       	mov    $0x376,%eax
-  400fa0:	2d 7b 02 00 00       	sub    $0x27b,%eax
-  400fa5:	eb 05                	jmp    400fac <phase_3+0x51>
-  400fa7:	b8 00 00 00 00       	mov    $0x0,%eax
-  400fac:	83 c0 3a             	add    $0x3a,%eax
-  400faf:	eb 05                	jmp    400fb6 <phase_3+0x5b>
-  400fb1:	b8 00 00 00 00       	mov    $0x0,%eax
-  400fb6:	2d 93 01 00 00       	sub    $0x193,%eax
-  400fbb:	eb 05                	jmp    400fc2 <phase_3+0x67>
-  400fbd:	b8 00 00 00 00       	mov    $0x0,%eax
-  400fc2:	05 da 03 00 00       	add    $0x3da,%eax
-  400fc7:	eb 05                	jmp    400fce <phase_3+0x73>
-  400fc9:	b8 00 00 00 00       	mov    $0x0,%eax
-  400fce:	2d fd 00 00 00       	sub    $0xfd,%eax
-  400fd3:	eb 05                	jmp    400fda <phase_3+0x7f>
-  400fd5:	b8 00 00 00 00       	mov    $0x0,%eax
-  400fda:	05 fd 00 00 00       	add    $0xfd,%eax
-  400fdf:	eb 05                	jmp    400fe6 <phase_3+0x8b>
-  400fe1:	b8 00 00 00 00       	mov    $0x0,%eax
-  400fe6:	2d 95 03 00 00       	sub    $0x395,%eax
-  400feb:	eb 0a                	jmp    400ff7 <phase_3+0x9c>
-  400fed:	e8 c1 06 00 00       	call   4016b3 <explode_bomb>
-  400ff2:	b8 00 00 00 00       	mov    $0x0,%eax
-  400ff7:	83 7c 24 0c 05       	cmpl   $0x5,0xc(%rsp)
-  400ffc:	7f 06                	jg     401004 <phase_3+0xa9>
-  400ffe:	3b 44 24 08          	cmp    0x8(%rsp),%eax
-  401002:	74 05                	je     401009 <phase_3+0xae>
-  401004:	e8 aa 06 00 00       	call   4016b3 <explode_bomb>
-  401009:	48 83 c4 18          	add    $0x18,%rsp
-  40100d:	c3                   	ret
+```assembly
+Dump of assembler code for function phase_3:
+=> 0x0000000000400f5b <+0>:     sub    $0x18,%rsp ; mở rộng ngăn xếp 24 bytes tương đương với 6 hàng
+   0x0000000000400f5f <+4>:     lea    0x8(%rsp),%rcx
+   0x0000000000400f64 <+9>:     lea    0xc(%rsp),%rdx
+   0x0000000000400f69 <+14>:    mov    $0x401e3a,%esi ; Điều gì đó được chuyển qua thanh ghi %esi?
+   0x0000000000400f6e <+19>:    mov    $0x0,%eax
+   0x0000000000400f73 <+24>:    call   0x400c00 <__isoc99_sscanf@plt> ; hàm này có chức năng nhận đầu vào?
+   0x0000000000400f78 <+29>:    cmp    $0x1,%eax ; so sánh 1 với kết quả từ input. Có tác dụng kiểm tra input đầu vào có đúng với dạng yêu cầu không?
+   0x0000000000400f7b <+32>:    jg     0x400f82 <phase_3+39> ; nhảy tới dòng 39 / bỏ qua bomb nếu kết quả từ input lớn hơn 1
+   0x0000000000400f7d <+34>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f82 <+39>:    cmpl   $0x7,0xc(%rsp) ; so sánh 7 với giá trị tại địa chỉ %rsp + 0xc
+   0x0000000000400f87 <+44>:    ja     0x400fed <phase_3+146> ; nhảy tới bomb nếu kết quả từ input nhỏ hơn 7
+   0x0000000000400f89 <+46>:    mov    0xc(%rsp),%eax
+   0x0000000000400f8d <+50>:    jmp    *0x401b50(,%rax,8)
+
+   0x0000000000400f94 <+57>:    mov    $0x0,%eax
+   0x0000000000400f99 <+62>:    jmp    0x400fa0 <phase_3+69>
+   0x0000000000400f9b <+64>:    mov    $0x376,%eax
+
+   0x0000000000400fa0 <+69>:    sub    $0x27b,%eax
+   0x0000000000400fa5 <+74>:    jmp    0x400fac <phase_3+81>
+   0x0000000000400fa7 <+76>:    mov    $0x0,%eax
+
+   0x0000000000400fac <+81>:    add    $0x3a,%eax
+   0x0000000000400faf <+84>:    jmp    0x400fb6 <phase_3+91>
+   0x0000000000400fb1 <+86>:    mov    $0x0,%eax
+
+   0x0000000000400fb6 <+91>:    sub    $0x193,%eax
+   0x0000000000400fbb <+96>:    jmp    0x400fc2 <phase_3+103>
+   0x0000000000400fbd <+98>:    mov    $0x0,%eax
+
+   0x0000000000400fc2 <+103>:   add    $0x3da,%eax
+   0x0000000000400fc7 <+108>:   jmp    0x400fce <phase_3+115>
+   0x0000000000400fc9 <+110>:   mov    $0x0,%eax
+--Type <RET> for more, q to quit, c to continue without paging--RET
+   0x0000000000400fce <+115>:   sub    $0xfd,%eax
+   0x0000000000400fd3 <+120>:   jmp    0x400fda <phase_3+127>
+   0x0000000000400fd5 <+122>:   mov    $0x0,%eax
+
+   0x0000000000400fda <+127>:   add    $0xfd,%eax
+   0x0000000000400fdf <+132>:   jmp    0x400fe6 <phase_3+139>
+   0x0000000000400fe1 <+134>:   mov    $0x0,%eax
+
+   0x0000000000400fe6 <+139>:   sub    $0x395,%eax
+   0x0000000000400feb <+144>:   jmp    0x400ff7 <phase_3+156>
+   0x0000000000400fed <+146>:   call   0x4016b3 <explode_bomb>
+   0x0000000000400ff2 <+151>:   mov    $0x0,%eax
+   0x0000000000400ff7 <+156>:   cmpl   $0x5,0xc(%rsp)
+   0x0000000000400ffc <+161>:   jg     0x401004 <phase_3+169>
+   0x0000000000400ffe <+163>:   cmp    0x8(%rsp),%eax
+   0x0000000000401002 <+167>:   je     0x401009 <phase_3+174>
+   0x0000000000401004 <+169>:   call   0x4016b3 <explode_bomb>
+   0x0000000000401009 <+174>:   add    $0x18,%rsp
+   0x000000000040100d <+178>:   ret
+End of assembler dump.
+```
+
+Từ đoạn mã ở trên chúng ta có thể thấy đây là một câu lệnh `switch statement`. Chúng ta tách từng trường hợp (case) bằng một khoảng trắng ở giữa.
+
+Việc đầu tiên chúng ta cần làm chính là xác định dạng của đáp án. Chúng ta sẽ để ý tới dòng <+14>.
+
+```assembly
+   0x0000000000400f69 <+14>:    mov    $0x401e3a,%esi
+
+   (gdb) x/s 0x401e3a
+   0x401e3a:       "%d %d"
+```
+
+Như vậy đáp án của chúng ta có dạng là 2 số nguyên, cách nhau bởi 1 khoảng trắng. Thử với đáp án là 1 2.
+
+```assembly
+   0x0000000000400f82 <+39>:    cmpl   $0x7,0xc(%rsp) ; so sánh 7 với giá trị tại địa chỉ %rsp + 0xc
+   0x0000000000400f87 <+44>:    ja     0x400fed <phase_3+146> ; nhảy tới bomb nếu kết quả từ input nhỏ hơn 7
+   0x0000000000400f89 <+46>:    mov    0xc(%rsp),%eax
+   0x0000000000400f8d <+50>:    jmp    *0x401b50(,%rax,8)
+```
+
+Để kiểm tra xem giá trị nào đang được so sánh với 7 ta chhuyển breakpoint tới dòng <+39> và thực hiện lệnh `i r` để xem giá trị của các thanh ghi.
+
+```assembly
+rsp            0x7fffffffdeb0      0x7fffffffdeb0
+```
+
+Vì địa chỉ ta cần xem giá trị là `%rsp + 0xc = 0x7fffffffdebc` nên ta dùng lệnh `x/d 0x7fffffffdebc` để xem giá trị của nó.
+
+```assembly
+   (gdb) x/d 0x7fffffffdebc
+   0x7fffffffdebc: 1
+```
+
+Ta được kết luận, số đang được so sánh với 7 chính là số nguyên thứ nhất mà ta nhập vào từ bàn phím.
+
+```assembly
+=> 0x0000000000400f82 <+39>:    cmpl   $0x7,0xc(%rsp)
+   0x0000000000400f87 <+44>:    ja     0x400fed <phase_3+146> ; ja = jump if above (nhảy nếu lớn hơn)
+
+   0x0000000000400fed <+146>:   call   0x4016b3 <explode_bomb>
+```
+
+Như vậy số thứ nhất nhập vào từ bàn phím không được lớn hơn 7 nếu không bom sẽ nổ.
+
+```assembly
+   0x0000000000400f89 <+46>:    mov    0xc(%rsp),%eax
 ```
 
 ## Phase 4:
