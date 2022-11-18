@@ -12,8 +12,6 @@ _The article is referenced from:_
 
 - [https://github.com/sc2225/Bomb-Lab](https://github.com/sc2225/Bomb-Lab)
 
-## Overview / Tổng quan về giải bomb
-
 Read in this [post](https:;github.com/kr4zym3nvn/Analysis-of-Binary-Bomb-Lab/blob/master/Analysis%20of%20CME%20bomb%20lab%20program.md)
 
 ## Getting Strings and Objdump
