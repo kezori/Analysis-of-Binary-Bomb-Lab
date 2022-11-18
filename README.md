@@ -5,6 +5,7 @@
 ```
 Start working on 11/17/2022 - During the period of the final exam of the first term in 2022
 Please feel free to fork or star if helpful! (^^ゞ
+A41316 - Nguyễn Hữu Khoa
 ```
 
 _The article is referenced from:_
@@ -363,8 +364,34 @@ Di chuyển giá trị tại địa chỉ %rbx + 0xc (tương đương số th�
 `0x0000000000400f31 <+37>: cmp %eax,(%rbx)`
 Lúc này so sánh giá trị tại 2 thanh ghi %eax và %rbx (tương đương số thứ 5 và số thứ 2 nhập vào)
 
-Cứ tiếp tục như vậy, chúng ta sẽ so sánh các số thứ 3 và số thứ 5, không bằng nhau và chuyển về dòng 31 tiếp tục so sánh số thứ 4 và số thứ 6.
-Dễ thấy thanh ghi %rbx sẽ giữ địa chỉ có giá trị từng số mà ta nhập vào,
+So sánh giá trị, nếu bằng sẽ nhảy tới dòng 46
+`0x0000000000400f33 <+39>: je 0x400f3a <phase_2+46>`
+
+```assembly
+   0x0000000000400f3a <+46>:    add    (%r12),%ebp
+   0x0000000000400f3e <+50>:    add    $0x4,%rbx
+   0x0000000000400f42 <+54>:    cmp    %r13,%rbx
+   0x0000000000400f45 <+57>:    jne    0x400f2b <phase_2+31>
+```
+
+Dễ nhận ra rằng chúng ta lại đang trong vòng lặp và tiếp tục để thanh ghi %rbx trỏ tới các địa chỉ chứa các số mình nhập vào, và so sánh các cặp số: số thứ nhất với số thứ 4, số thứ 2 với số thứ 5 và số thứ 3 với số thứ 6. Ngay khi 1 trong các cặp số trên khác giá trị nhau bom sẽ phát nổ.
+
+Các chuỗi 6 số nguyên thỏa mãn là các chuỗi 6 số đối xứng với nhau, ví dụ: 1 2 3 3 2 1
+
+Thử đáp án : 1 2 3 3 2 1
+
+```assembly
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Science isn't about why, it's about why not?
+Phase 1 defused. How about the next one?
+1 2 3 1 2 3
+
+Breakpoint 1, 0x0000000000400f0c in phase_2 ()
+(gdb) c
+Continuing.
+That's number 2.  Keep going!
+```
 
 ## Phase 3:
 
