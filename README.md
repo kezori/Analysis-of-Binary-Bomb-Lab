@@ -927,81 +927,142 @@ try phase 6 for extra credit, you can continue.  Just beware!
 
 ## Phase 6:
 
-```objdump
-00000000004010c8 <phase_6>:
-  4010c8:	41 55                	push   %r13
-  4010ca:	41 54                	push   %r12
-  4010cc:	55                   	push   %rbp
-  4010cd:	53                   	push   %rbx
-  4010ce:	48 83 ec 58          	sub    $0x58,%rsp
-  4010d2:	48 8d 74 24 30       	lea    0x30(%rsp),%rsi
-  4010d7:	e8 f9 05 00 00       	call   4016d5 <read_six_numbers>
-  4010dc:	4c 8d 6c 24 30       	lea    0x30(%rsp),%r13
-  4010e1:	41 bc 00 00 00 00    	mov    $0x0,%r12d
-  4010e7:	4c 89 ed             	mov    %r13,%rbp
-  4010ea:	41 8b 45 00          	mov    0x0(%r13),%eax
-  4010ee:	83 e8 01             	sub    $0x1,%eax
-  4010f1:	83 f8 05             	cmp    $0x5,%eax
-  4010f4:	76 05                	jbe    4010fb <phase_6+0x33>
-  4010f6:	e8 b8 05 00 00       	call   4016b3 <explode_bomb>
-  4010fb:	41 83 c4 01          	add    $0x1,%r12d
-  4010ff:	41 83 fc 06          	cmp    $0x6,%r12d
-  401103:	75 07                	jne    40110c <phase_6+0x44>
-  401105:	be 00 00 00 00       	mov    $0x0,%esi
-  40110a:	eb 42                	jmp    40114e <phase_6+0x86>
-  40110c:	44 89 e3             	mov    %r12d,%ebx
-  40110f:	48 63 c3             	movslq %ebx,%rax
-  401112:	8b 44 84 30          	mov    0x30(%rsp,%rax,4),%eax
-  401116:	39 45 00             	cmp    %eax,0x0(%rbp)
-  401119:	75 05                	jne    401120 <phase_6+0x58>
-  40111b:	e8 93 05 00 00       	call   4016b3 <explode_bomb>
-  401120:	83 c3 01             	add    $0x1,%ebx
-  401123:	83 fb 05             	cmp    $0x5,%ebx
-  401126:	7e e7                	jle    40110f <phase_6+0x47>
-  401128:	49 83 c5 04          	add    $0x4,%r13
-  40112c:	eb b9                	jmp    4010e7 <phase_6+0x1f>
-  40112e:	48 8b 52 08          	mov    0x8(%rdx),%rdx
-  401132:	83 c0 01             	add    $0x1,%eax
-  401135:	39 c8                	cmp    %ecx,%eax
-  401137:	75 f5                	jne    40112e <phase_6+0x66>
-  401139:	eb 05                	jmp    401140 <phase_6+0x78>
-  40113b:	ba 20 33 60 00       	mov    $0x603320,%edx
-  401140:	48 89 14 74          	mov    %rdx,(%rsp,%rsi,2)
-  401144:	48 83 c6 04          	add    $0x4,%rsi
-  401148:	48 83 fe 18          	cmp    $0x18,%rsi
-  40114c:	74 15                	je     401163 <phase_6+0x9b>
-  40114e:	8b 4c 34 30          	mov    0x30(%rsp,%rsi,1),%ecx
-  401152:	83 f9 01             	cmp    $0x1,%ecx
-  401155:	7e e4                	jle    40113b <phase_6+0x73>
-  401157:	b8 01 00 00 00       	mov    $0x1,%eax
-  40115c:	ba 20 33 60 00       	mov    $0x603320,%edx
-  401161:	eb cb                	jmp    40112e <phase_6+0x66>
-  401163:	48 8b 1c 24          	mov    (%rsp),%rbx
-  401167:	48 8d 44 24 08       	lea    0x8(%rsp),%rax
-  40116c:	48 8d 74 24 30       	lea    0x30(%rsp),%rsi
-  401171:	48 89 d9             	mov    %rbx,%rcx
-  401174:	48 8b 10             	mov    (%rax),%rdx
-  401177:	48 89 51 08          	mov    %rdx,0x8(%rcx)
-  40117b:	48 83 c0 08          	add    $0x8,%rax
-  40117f:	48 39 f0             	cmp    %rsi,%rax
-  401182:	74 05                	je     401189 <phase_6+0xc1>
-  401184:	48 89 d1             	mov    %rdx,%rcx
-  401187:	eb eb                	jmp    401174 <phase_6+0xac>
-  401189:	48 c7 42 08 00 00 00 	movq   $0x0,0x8(%rdx)
-  401190:	00
-  401191:	bd 05 00 00 00       	mov    $0x5,%ebp
-  401196:	48 8b 43 08          	mov    0x8(%rbx),%rax
-  40119a:	8b 00                	mov    (%rax),%eax
-  40119c:	39 03                	cmp    %eax,(%rbx)
-  40119e:	7d 05                	jge    4011a5 <phase_6+0xdd>
-  4011a0:	e8 0e 05 00 00       	call   4016b3 <explode_bomb>
-  4011a5:	48 8b 5b 08          	mov    0x8(%rbx),%rbx
-  4011a9:	83 ed 01             	sub    $0x1,%ebp
-  4011ac:	75 e8                	jne    401196 <phase_6+0xce>
-  4011ae:	48 83 c4 58          	add    $0x58,%rsp
-  4011b2:	5b                   	pop    %rbx
-  4011b3:	5d                   	pop    %rbp
-  4011b4:	41 5c                	pop    %r12
-  4011b6:	41 5d                	pop    %r13
-  4011b8:	c3                   	ret
+Khi mình làm xong Phase 5 cũng là lúc 1h sáng =))
+Từ sau này chừa cái tật để dành tới trước hôm thi mới xem (￣ y▽ ￣)╭ Ohohoho.....
+
+```assembly
+Dump of assembler code for function phase_6:
+=> 0x00000000004010c8 <+0>:     push   %r13
+   0x00000000004010ca <+2>:     push   %r12
+   0x00000000004010cc <+4>:     push   %rbp
+   0x00000000004010cd <+5>:     push   %rbx
+   0x00000000004010ce <+6>:     sub    $0x58,%rsp
+   0x00000000004010d2 <+10>:    lea    0x30(%rsp),%rsi
+   0x00000000004010d7 <+15>:    call   0x4016d5 <read_six_numbers>
+   0x00000000004010dc <+20>:    lea    0x30(%rsp),%r13
+   0x00000000004010e1 <+25>:    mov    $0x0,%r12d
+   0x00000000004010e7 <+31>:    mov    %r13,%rbp
+   0x00000000004010ea <+34>:    mov    0x0(%r13),%eax
+   0x00000000004010ee <+38>:    sub    $0x1,%eax
+   0x00000000004010f1 <+41>:    cmp    $0x5,%eax
+   0x00000000004010f4 <+44>:    jbe    0x4010fb <phase_6+51>
+   0x00000000004010f6 <+46>:    call   0x4016b3 <explode_bomb>
+   0x00000000004010fb <+51>:    add    $0x1,%r12d
+   0x00000000004010ff <+55>:    cmp    $0x6,%r12d
+   0x0000000000401103 <+59>:    jne    0x40110c <phase_6+68>
+   0x0000000000401105 <+61>:    mov    $0x0,%esi
+   0x000000000040110a <+66>:    jmp    0x40114e <phase_6+134>
+   0x000000000040110c <+68>:    mov    %r12d,%ebx
+   0x000000000040110f <+71>:    movslq %ebx,%rax
+   0x0000000000401112 <+74>:    mov    0x30(%rsp,%rax,4),%eax
+   0x0000000000401116 <+78>:    cmp    %eax,0x0(%rbp)
+   0x0000000000401119 <+81>:    jne    0x401120 <phase_6+88>
+   0x000000000040111b <+83>:    call   0x4016b3 <explode_bomb>
+   0x0000000000401120 <+88>:    add    $0x1,%ebx
+   0x0000000000401123 <+91>:    cmp    $0x5,%ebx
+   0x0000000000401126 <+94>:    jle    0x40110f <phase_6+71>
+   0x0000000000401128 <+96>:    add    $0x4,%r13
+--Type <RET> for more, q to quit, c to continue without paging--
+   0x000000000040112c <+100>:   jmp    0x4010e7 <phase_6+31>
+   0x000000000040112e <+102>:   mov    0x8(%rdx),%rdx
+   0x0000000000401132 <+106>:   add    $0x1,%eax
+   0x0000000000401135 <+109>:   cmp    %ecx,%eax
+   0x0000000000401137 <+111>:   jne    0x40112e <phase_6+102>
+   0x0000000000401139 <+113>:   jmp    0x401140 <phase_6+120>
+
+   0x000000000040113b <+115>:   mov    $0x603320,%edx
+   0x0000000000401140 <+120>:   mov    %rdx,(%rsp,%rsi,2)
+   0x0000000000401144 <+124>:   add    $0x4,%rsi
+   0x0000000000401148 <+128>:   cmp    $0x18,%rsi
+   0x000000000040114c <+132>:   je     0x401163 <phase_6+155>
+   0x000000000040114e <+134>:   mov    0x30(%rsp,%rsi,1),%ecx
+   0x0000000000401152 <+138>:   cmp    $0x1,%ecx
+   0x0000000000401155 <+141>:   jle    0x40113b <phase_6+115>
+   0x0000000000401157 <+143>:   mov    $0x1,%eax
+   0x000000000040115c <+148>:   mov    $0x603320,%edx
+   0x0000000000401161 <+153>:   jmp    0x40112e <phase_6+102>
+   0x0000000000401163 <+155>:   mov    (%rsp),%rbx
+   0x0000000000401167 <+159>:   lea    0x8(%rsp),%rax
+   0x000000000040116c <+164>:   lea    0x30(%rsp),%rsi
+   0x0000000000401171 <+169>:   mov    %rbx,%rcx
+   0x0000000000401174 <+172>:   mov    (%rax),%rdx
+   0x0000000000401177 <+175>:   mov    %rdx,0x8(%rcx)
+   0x000000000040117b <+179>:   add    $0x8,%rax
+   0x000000000040117f <+183>:   cmp    %rsi,%rax
+   0x0000000000401182 <+186>:   je     0x401189 <phase_6+193>
+   0x0000000000401184 <+188>:   mov    %rdx,%rcx
+   0x0000000000401187 <+191>:   jmp    0x401174 <phase_6+172>
+   0x0000000000401189 <+193>:   movq   $0x0,0x8(%rdx)
+   0x0000000000401191 <+201>:   mov    $0x5,%ebp
+   0x0000000000401196 <+206>:   mov    0x8(%rbx),%rax
+--Type <RET> for more, q to quit, c to continue without paging--
+   0x000000000040119a <+210>:   mov    (%rax),%eax
+   0x000000000040119c <+212>:   cmp    %eax,(%rbx)
+   0x000000000040119e <+214>:   jge    0x4011a5 <phase_6+221>
+   0x00000000004011a0 <+216>:   call   0x4016b3 <explode_bomb>
+   0x00000000004011a5 <+221>:   mov    0x8(%rbx),%rbx
+   0x00000000004011a9 <+225>:   sub    $0x1,%ebp
+   0x00000000004011ac <+228>:   jne    0x401196 <phase_6+206>
+   0x00000000004011ae <+230>:   add    $0x58,%rsp
+   0x00000000004011b2 <+234>:   pop    %rbx
+   0x00000000004011b3 <+235>:   pop    %rbp
+   0x00000000004011b4 <+236>:   pop    %r12
+   0x00000000004011b6 <+238>:   pop    %r13
+   0x00000000004011b8 <+240>:   ret
+```
+
+Dòng này sẽ đảm bảo mọi số mình nhập vào không có số nào lớn hơn 6
+
+```assembly
+   0x00000000004010f1 <+41>:    cmp    $0x5,%eax
+```
+
+Dòng này sẽ đảm bảo không có 2 số nào trùng nhau bằng sử dụng cả vòng lặp 6 lần
+
+```assembly
+   0x0000000000401116 <+78>:    cmp    %eax,0x0(%rbp)
+   0x0000000000401119 <+81>:    jne    0x401120 <phase_6+88>
+   0x000000000040111b <+83>:    call   0x4016b3 <explode_bomb>
+   0x0000000000401120 <+88>:    add    $0x1,%ebx
+   0x0000000000401123 <+91>:    cmp    $0x5,%ebx
+   0x0000000000401126 <+94>:    jle    0x40110f <phase_6+71>
+```
+
+Để ý tới địa chỉ xuất hiện ở dòng `<+115>`
+
+```assembly
+   0x000000000040113b <+115>:   mov    $0x603320,%edx
+
+   (gdb) x/44x 0x603320
+   0x603320 <node1>:       0x000001bb      0x00000001      0x00603330      0x00000000
+   0x603330 <node2>:       0x00000227      0x00000002      0x00603340      0x00000000
+   0x603340 <node3>:       0x00000361      0x00000003      0x00603350      0x00000000
+   0x603350 <node4>:       0x0000020f      0x00000004      0x00603360      0x00000000
+   0x603360 <node5>:       0x00000142      0x00000005      0x00603370      0x00000000
+   0x603370 <node6>:       0x0000025a      0x00000006      0x00000000      0x00000000
+   0x603380 <lab_id>:      0x73637775      0x31353365      0x7335312d      0x616c2d70
+   0x603390 <lab_id+16>:   0x00003262      0x00000000      0x00000000      0x00000000
+   0x6033a0 <lab_id+32>:   0x00000000      0x00000000      0x00000000      0x00000000
+   0x6033b0 <lab_id+48>:   0x00000000      0x00000000      0x00000000      0x00000000
+   0x6033c0 <lab_id+64>:   0x00000000      0x00000000      0x00000000      0x00000000
+```
+
+0x000001bb = 443 ứng với số 1
+0x00000227 = 551 ứng với số 2
+0x00000361 = 865 ứng với số 3
+0x0000020f = 527 ứng với số 4
+0x00000142 = 322 ứng với số 5
+0x0000025a = 602 ứng với số 6
+
+Sắp xếp giá trị theo từ lớn tới bé ta có 865, 602, 551, 527, 443, 322 hay 3, 6, 2, 4, 1, 5
+
+**Kết quả:**
+
+```assembly
+3 6 2 4 1 5
+
+Breakpoint 1, 0x00000000004010c8 in phase_6 ()
+(gdb) c
+Continuing.
+Congratulations! You've defused the bomb! Again!
 ```
