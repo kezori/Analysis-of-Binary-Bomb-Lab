@@ -21,7 +21,6 @@ _Chạy các dòng lệnh sau để tạo file text mà chúng ta sẽ cần sau
 ```
 strings bomb > strings.txt
 objdump -d bomb > assembly.txt
-
 ```
 
 You should now have two files: strings.txt and assembly.txt. Now let’s get started with Phase 1!
