@@ -733,37 +733,196 @@ Ta cần phải nhập vào 1 số để hàm `<func4>` trả về giá trị 24
 
 ## Phase 5:
 
-```objdump
-0000000000401069 <phase_5>:
-  401069:	53                   	push   %rbx
-  40106a:	48 83 ec 10          	sub    $0x10,%rsp
-  40106e:	48 89 fb             	mov    %rdi,%rbx
-  401071:	e8 4b 02 00 00       	call   4012c1 <string_length>
-  401076:	83 f8 06             	cmp    $0x6,%eax
-  401079:	74 3f                	je     4010ba <phase_5+0x51>
-  40107b:	e8 33 06 00 00       	call   4016b3 <explode_bomb>
-  401080:	eb 38                	jmp    4010ba <phase_5+0x51>
-  401082:	0f b6 14 03          	movzbl (%rbx,%rax,1),%edx
-  401086:	83 e2 0f             	and    $0xf,%edx
-  401089:	0f b6 92 90 1b 40 00 	movzbl 0x401b90(%rdx),%edx
-  401090:	88 14 04             	mov    %dl,(%rsp,%rax,1)
-  401093:	48 83 c0 01          	add    $0x1,%rax
-  401097:	48 83 f8 06          	cmp    $0x6,%rax
-  40109b:	75 e5                	jne    401082 <phase_5+0x19>
-  40109d:	c6 44 24 06 00       	movb   $0x0,0x6(%rsp)
-  4010a2:	be 3e 1b 40 00       	mov    $0x401b3e,%esi
-  4010a7:	48 89 e7             	mov    %rsp,%rdi
-  4010aa:	e8 2f 02 00 00       	call   4012de <strings_not_equal>
-  4010af:	85 c0                	test   %eax,%eax
-  4010b1:	74 0f                	je     4010c2 <phase_5+0x59>
-  4010b3:	e8 fb 05 00 00       	call   4016b3 <explode_bomb>
-  4010b8:	eb 08                	jmp    4010c2 <phase_5+0x59>
-  4010ba:	b8 00 00 00 00       	mov    $0x0,%eax
-  4010bf:	90                   	nop
-  4010c0:	eb c0                	jmp    401082 <phase_5+0x19>
-  4010c2:	48 83 c4 10          	add    $0x10,%rsp
-  4010c6:	5b                   	pop    %rbx
-  4010c7:	c3                   	ret
+```assembly
+Dump of assembler code for function phase_5:
+=> 0x0000000000401069 <+0>:     push   %rbx
+   0x000000000040106a <+1>:     sub    $0x10,%rsp
+   0x000000000040106e <+5>:     mov    %rdi,%rbx ; lưu địa chỉ của chuỗi nhập vào vào thanh ghi %rbx
+   0x0000000000401071 <+8>:     call   0x4012c1 <string_length> ;
+   0x0000000000401076 <+13>:    cmp    $0x6,%eax ; so sánh giá trị tại địa chỉ lưu trong thanh ghi %eax với 6
+   0x0000000000401079 <+16>:    je     0x4010ba <phase_5+81> ; nếu bằng 6 thì nhảy tới dòng <+81> không thì bomb nổ
+   0x000000000040107b <+18>:    call   0x4016b3 <explode_bomb>
+   0x0000000000401080 <+23>:    jmp    0x4010ba <phase_5+81>
+   0x0000000000401082 <+25>:    movzbl (%rbx,%rax,1),%edx
+   0x0000000000401086 <+29>:    and    $0xf,%edx
+   0x0000000000401089 <+32>:    movzbl 0x401b90(%rdx),%edx
+   0x0000000000401090 <+39>:    mov    %dl,(%rsp,%rax,1)
+   0x0000000000401093 <+42>:    add    $0x1,%rax
+   0x0000000000401097 <+46>:    cmp    $0x6,%rax
+   0x000000000040109b <+50>:    jne    0x401082 <phase_5+25>
+   0x000000000040109d <+52>:    movb   $0x0,0x6(%rsp)
+   0x00000000004010a2 <+57>:    mov    $0x401b3e,%esi
+   0x00000000004010a7 <+62>:    mov    %rsp,%rdi
+   0x00000000004010aa <+65>:    call   0x4012de <strings_not_equal>
+   0x00000000004010af <+70>:    test   %eax,%eax
+   0x00000000004010b1 <+72>:    je     0x4010c2 <phase_5+89>
+   0x00000000004010b3 <+74>:    call   0x4016b3 <explode_bomb>
+   0x00000000004010b8 <+79>:    jmp    0x4010c2 <phase_5+89>
+   0x00000000004010ba <+81>:    mov    $0x0,%eax
+   0x00000000004010bf <+86>:    nop
+   0x00000000004010c0 <+87>:    jmp    0x401082 <phase_5+25>
+   0x00000000004010c2 <+89>:    add    $0x10,%rsp
+   0x00000000004010c6 <+93>:    pop    %rbx
+   0x00000000004010c7 <+94>:    ret
+```
+
+Kiểm tra hàm `<string_length>`:
+
+```assembly
+Dump of assembler code for function string_length:
+   0x00000000004012c1 <+0>:     cmpb   $0x0,(%rdi) ; rdi = string input. Kiểm tra xem có gì trong chuỗi nhập vào hay không
+   0x00000000004012c4 <+3>:     je     0x4012d8 <string_length+23>
+   0x00000000004012c6 <+5>:     mov    %rdi,%rdx ; di chuyển chuỗi nhập vào qua thanh ghi %rdx
+   0x00000000004012c9 <+8>:     add    $0x1,%rdx ; string + 1
+   0x00000000004012cd <+12>:    mov    %edx,%eax; eax = string + 1
+   0x00000000004012cf <+14>:    sub    %edi,%eax ; eax = string + 1 - string
+   0x00000000004012d1 <+16>:    cmpb   $0x0,(%rdx) ; so sánh xem có gì trong chuỗi nhập vào hay không
+   0x00000000004012d4 <+19>:    jne    0x4012c9 <string_length+8>
+   0x00000000004012d6 <+21>:    repz ret
+   0x00000000004012d8 <+23>:    mov    $0x0,%eax ; chuỗi rỗng sẽ trả về 0 vào thanh ghi %eax
+   0x00000000004012dd <+28>:    ret
+```
+
+Có vẻ hàm sẽ trả lại độ dài của chuỗi. Với việc muốn chuỗi nhập vào có giá trị trả về từ hàm trên là 6 ta thử chuỗi `ibcghk` để xem chúng ta có thể vượt qua bomb đầu tiên hay không
+
+```assembly
+   0x0000000000401071 <+8>:     call   0x4012c1 <string_length>
+=> 0x0000000000401076 <+13>:    cmp    $0x6,%eax
+   0x0000000000401079 <+16>:    je     0x4010ba <phase_5+81>
+   0x000000000040107b <+18>:    call   0x4016b3 <explode_bomb>
+
+(gdb) i r
+rax            0x6                 6
+rbx            0x603b80            6306688
+rcx            0x6                 6
+```
+
+Chúng ta có thể thấy tại điểm này, %eax từ hàm `<string_length>` đã có giá trị là 6. Vì vậy hàm `<string_length>` chắc chắn cho ta độ dài của một chuỗi và đảm bảo rằng đầu vào dài 6 ký tự
+
+Khi có được chuỗi là 6 kí tự, nhảy tới dòng `<+81>` và trở lại với dòng `<+25>`
+
+```assembly
+   0x0000000000401079 <+16>:    je     0x4010ba <phase_5+81>
+
+   0x00000000004010ba <+81>:    mov    $0x0,%eax ; đặt giá trị 0 vào ô nhớ có địa chỉ tại thanh ghi %eax
+
+   0x00000000004010c0 <+87>:    jmp    0x401082 <phase_5+25> ; nhảy tới dòng <+25>
+
+   0x0000000000401082 <+25>:    movzbl (%rbx,%rax,1),%edx ; lấy giá trị tại ô nhớ có địa chỉ là (%rbx,%rax,1) và đặt vào thanh ghi %edx
+```
+
+<!-- movbzl means: move a byte with zero extension into 32-bit (“l”) register -->
+
+Tại dòng `<+81>` giá trị tại địa chỉ (%rbx, %rax, 1) được chuyển vào thanh ghi `%edx`. Nhưng điều ta quan tâm thì là giá trị được truyền vào thanh ghi `%edx` là gì. Để xem được giá trị này ta đặt breakpoit tại dòng `<+29>` với lệnh `u*0x0000000000401086` và dùng lệnh `info register` để xem giá trị của thanh ghi `%edx`
+
+```assembly
+(gdb) u*0x0000000000401086
+0x0000000000401086 in phase_5 ()
+(gdb) i r
+rax            0x0                 0
+rbx            0x603b80            6306688
+rcx            0x6                 6
+rdx            0x69                105
+```
+
+`105` trong bảng mã ASCII là kí tự `i` hay chính là kí tự đầu tiên của chuỗi ta đã nhập vào `ibcghk`
+
+```assembly
+   0x0000000000401086 <+29>:    and    $0xf,%edx ; thực hiện phép AND với 0xf và đặt kết quả vào thanh ghi %edx
+   0x0000000000401089 <+32>: movzbl 0x401b90(%rdx),%edx ; lấy giá trị tại ô nhớ có địa chỉ là 0x401b90(%rdx) và đặt vào thanh ghi %edx
+```
+
+Tiếp tục thực hiện tương tự như trên và biết được tại địa chỉ (0x401b90)%rdx có giá trị `98` (là kí tự `b` trong bảng mã ASCII) và chính là kí tự thứ 2 trong chuỗi ta nhập vào bàn phím `ibcghk`
+
+```assembly
+(gdb) i r
+rax            0x0                 0
+rbx            0x603b80            6306688
+rcx            0x6                 6
+rdx            0x62                98
+```
+
+Tiếp đó là lệnh chuyển giá trị tại thanh ghi %dl qua địa chỉ chứa kí tự thứ nhất của chuỗi nhập vào.
+
+```assembly
+   0x0000000000401090 <+39>: mov %dl,(%rsp,%rax,1) ; đặt giá trị tại thanh ghi %dl vào ô nhớ có địa chỉ (%rsp,%rax,1)
+   0x0000000000401093 <+42>: add $0x1,%rax ; thực hiện phép cộng với 1 và đặt kết quả vào thanh ghi %rax
+   0x0000000000401097 <+46>: cmp $0x6,%rax ; so sánh giá trị tại thanh ghi %rax với 6
+   0x000000000040109b <+50>: jne 0x401082 <phase_5+25>
+```
+
+Nhận thấy được chuỗi đang có sự thay đổi về kí tự, kí tự đầu tiên của chuỗi sẽ không còn là `i` nữa. Sử dụng lệnh `i r` để check giá trị sau khi thực hiện lệnh `mov %dl,(%rsp,%rax,1)` và ta có kết quả như sau
+
+```assembly
+(gdb) i r
+rax            0x0                 0
+rbx            0x603b80            6306688
+rcx            0x6                 6
+rdx            0x62                98
+```
+
+Vậy là kí tự đầu tiên của chuỗi đã được thay đổi thành `b`. Ta tiếp tục với những dòng sau đó:
+
+Có thể dự đoán rằng sẽ có sự thay đổi kí tự của cả chuỗi. Ta bỏ qua tất cả để tới dòng `<+62>` để xem điều gì được đưa vào hàm `<strings_not_equal>`
+
+```assembly
+   0x00000000004010a2 <+57>:    mov    $0x401b3e,%esi
+=> 0x00000000004010a7 <+62>:    mov    %rsp,%rdi
+   0x00000000004010aa <+65>:    call   0x4012de <strings_not_equal>
+   0x00000000004010af <+70>:    test   %eax,%eax
+
+   (gdb) i r
+   rax            0x6                 6
+   rbx            0x603b80            6306688
+   rcx            0x6                 6
+   rdx            0x6e                110
+   rsi            0x401b3e            4201278
+   rdi            0x603b80            6306688
+
+   (gdb) x/s 6306688
+   0x603b80:       "ibdghk"
+
+   (gdb) x/s 4201278
+   0x401b3e:       "giants"
+```
+
+```assembly
+   (gdb) i r
+   rax            0x6                 6
+   rbx            0x603b80            6306688
+   rcx            0x6                 6
+   rdx            0x6e                110
+   rsi            0x401b3e            4201278
+   rdi            0x7fffffffdee0      140737488346848
+
+   (gdb) x/s 140737488346848
+   0x7fffffffdee0: "brehon"
+```
+
+Chuỗi nhập vào là `ibcghk` và chuỗi sau khi được mã hóa lại `brehon`. Như vậy ta cần nhập vào 1 chuỗi để khi kết thúc mã hóa sẽ có giá trị là `giants`
+
+Sau hàng loạt lần chạy thử ta có bảng mã hóa như sau:
+| Kí tự | **Mã hóa** | Kí tự | **Mã hóa** | Kí tự | **Mã hóa** |
+|:-----:|:----------:|:-----:|:----------:|:-----:|:----------:|
+| a | **s** | b | **r** | c | **e** |
+| d | **e** | e | **a** | f | **w** |
+| g | **h** | h | **o** | i | **b** |
+| j | **p** | k | **n** | l | **u** |
+| m | **t** | n | **f** | o | **g** |
+| p | **i** | q | **s** | r | **r** |
+| s | **v** | t | **e** | u | **a** |
+| v | **w** | z | **p** | | |
+
+Dựa vào bảng trên dễ dàng tìm ra chuỗi cần nhập vào là `opukmq`
+
+```assembly
+opukmq
+Breakpoint 1, 0x0000000000401069 in phase_5 ()
+(gdb) c
+Continuing.
+Congratulations! You've (mostly) defused the bomb!
+Hit Control-C to escape phase 6 (for free!), but if you want to
+try phase 6 for extra credit, you can continue.  Just beware!
 ```
 
 ## Phase 6:
