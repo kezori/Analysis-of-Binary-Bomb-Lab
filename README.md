@@ -365,7 +365,7 @@ Ta thấy số thứ 2 được so sánh với giá trị tại ô nhớ lưu �
 So sánh 2 số thứ 2 và 4 nhập vào nếu không bằng nhau sẽ nhảy tới dòng 31
 
 ```assembly
-   0x0000000000400f2b <+31>:    mov    %rbx,%r12 ; chuyển giá trị số thứ 2 vào thanh ghi %r12
+0x0000000000400f2b <+31>:    mov    %rbx,%r12 ; chuyển giá trị số thứ 2 vào thanh ghi %r12
 ```
 
 ```assembly
@@ -492,7 +492,7 @@ Như vậy đáp án của chúng ta có dạng là 2 số nguyên, cách nhau b
    0x0000000000400f8d <+50>:    jmp    *0x401b50(,%rax,8)
 ```
 
-Để kiểm tra xem giá trị nào đang được so sánh với 7 ta chhuyển breakpoint tới dòng <+39> và thực hiện lệnh `i r` để xem giá trị của các thanh ghi.
+Để kiểm tra xem giá trị nào đang lưu ở địa chỉ trong thanh ghi (%rsp + 0xc) được so sánh với 7 ta chhuyển breakpoint tới dòng <+39> và thực hiện lệnh `info register` để xem giá trị của các thanh ghi.
 
 ```assembly
 rsp            0x7fffffffdeb0      0x7fffffffdeb0
@@ -504,6 +504,15 @@ Vì địa chỉ ta cần xem giá trị là `%rsp + 0xc = 0x7fffffffdebc` nên 
    (gdb) x/d 0x7fffffffdebc
    0x7fffffffdebc: 1
 ```
+
+Hoặc đơn giản hơn có thể trực tiếp gọi lệnh `x/d $rsp + 0xc` để xem giá trị của nó.
+
+```assembly
+   (gdb) x/d $rsp + 0xc
+   0x7fffffffdebc: 1
+```
+
+Ta sẽ thấy %rsp+0xc có địa chỉ lưu trữ số nguyên thứ nhất
 
 Ta được kết luận, số đang được so sánh với 7 chính là số nguyên thứ nhất mà ta nhập vào từ bàn phím.
 
@@ -518,7 +527,97 @@ Như vậy số thứ nhất nhập vào từ bàn phím không được lớn h
 
 ```assembly
    0x0000000000400f89 <+46>:    mov    0xc(%rsp),%eax
+   0x0000000000400f8d <+50>:    jmp    *0x401b50(,%rax,8) ; địa chỉ nhảy tới = 0x401b50 + %rax(giá trị) * 8
+   0x0000000000400f94 <+57>:    mov    $0x0,%eax
 ```
+
+Tiếp đó, giá trị số thứ nhất được lưu vào thanh ghi `%eax`.
+Thay vì tính tay ta có thể dùng lệnh `x/x` để tính địa chỉ mà chương trình sẽ nhảy tới.
+
+```assembly
+   (gdb) x/x 0x401b50 + 1 * 8
+   0x401b58:       0x0000000000400f94
+```
+
+Xác định được địa chỉ mà chương trình sẽ nhảy tới là dòng <+57>. Với những số khác (từ 0 - 6) chúng ta sẽ có một kết quả khác nhau của địa chỉ được nhảy tới.
+
+```assembly
+   0x0000000000400f94 <+57>:    mov    $0x0,%eax ; chuyển giá trị 0 vào thanh ghi %eax
+   0x0000000000400f99 <+62>:    jmp    0x400fa0 <phase_3+69>
+
+   0x0000000000400fa0 <+69>:    sub    $0x27b,%eax ;
+   0x0000000000400fa5 <+74>:    jmp    0x400fac <phase_3+81>
+
+   0x0000000000400fac <+81>:    add    $0x3a,%eax ;
+   0x0000000000400faf <+84>:    jmp    0x400fb6 <phase_3+91>
+
+   0x0000000000400fb6 <+91>:    sub    $0x193,%eax ;
+   0x0000000000400fbb <+96>:    jmp    0x400fc2 <phase_3+103>
+
+   0x0000000000400fc2 <+103>:   add    $0x3da,%eax ;
+   0x0000000000400fc7 <+108>:   jmp    0x400fce <phase_3+115>
+
+   0x0000000000400fce <+115>:   sub    $0xfd,%eax ;
+   0x0000000000400fd3 <+120>:   jmp    0x400fda <phase_3+127>
+
+   0x0000000000400fda <+127>:   add    $0xfd,%eax ;
+   0x0000000000400fdf <+132>:   jmp    0x400fe6 <phase_3+139>
+
+   0x0000000000400fe6 <+139>:   sub    $0x395,%eax ;
+   0x0000000000400feb <+144>:   jmp    0x400ff7 <phase_3+156>
+
+   0x0000000000400ff7 <+156>:   cmpl   $0x5,0xc(%rsp) ; so sánh giá trị của thanh ghi %rsp + 0xc với 0x5
+   0x0000000000400ffc <+161>:   jg     0x401004 <phase_3+169> ; jg = jump if greater (nhảy nếu lớn hơn)
+   0x0000000000400ffe <+163>:   cmp    0x8(%rsp),%eax ; so sánh số thứ 2 với giá trị của thanh ghi %eax
+   0x0000000000401002 <+167>:   je     0x401009 <phase_3+174> ; je = jump if equal (nhảy nếu bằng)
+   0x0000000000401004 <+169>:   call   0x4016b3 <explode_bomb>
+   0x0000000000401009 <+174>:   add    $0x18,%rsp
+   0x000000000040100d <+178>:   ret
+```
+
+Sau hàng loạt những phép cộng trừ, ta có giá trị cuối cùng tại địa chỉ nằm trong thanh ghi %eax =
+
+Lúc này ta cần biết được xem 0x8(%rsp) có giá trị như thế nào và dễ thấy đấy chính là số thứ 2 mà ta đã nhập từ bàn phím.
+
+```assembly
+   (gdb) x/d $rsp + 0x8
+   0x7fffffffdeb8: 2
+```
+
+Ta được giới hạn thêm giá trị của số thứ nhất được nhập vào, khi này chỉ còn trong khoảng (0 - 4) vì nếu từ 5 sẽ nhảy tới bom.
+
+Tại dòng <+167> ta có câu lệnh so sánh giá trị của thanh ghi %eax với số thứ 2 được nhập vào. Nếu bằng nhau thì nhảy tới dòng <+174> và ngược lại sẽ nhảy tới dòng <+169> và gọi hàm explode_bomb. Như vậy chỉ cần biết được giá trị của thanh ghi %eax nữa thôi là ta có thể giải được bài này.
+
+```assembly
+   0x0000000000400ffe <+163>:   cmp    0x8(%rsp),%eax
+   0x0000000000401002 <+167>:   je     0x401009 <phase_3+174> ; je = jump if equal (nhảy nếu bằng)
+   0x0000000000401004 <+169>:   call   0x4016b3 <explode_bomb>
+   0x0000000000401009 <+174>:   add    $0x18,%rsp
+```
+
+Chuyển breakpoint tới sau dòng so sánh (dòng <+163>) và thực hiện lệnh `info register` để check giá trị
+
+```assembly
+   (gdb) u*0x0000000000401002
+   0x0000000000401002 in phase_3 ()
+   (gdb) i r
+   rax            0xfffffc71          4294966385
+   rbx            0x0                 0
+   rcx            0x20                32
+   rdx            0x0                 0
+   rsi            0x2                 2
+   rdi            0x7fffffffd860      140737488345184
+   rbp            0x1                 0x1
+   rsp            0x7fffffffdeb0      0x7fffffffdeb0
+```
+
+Có được giá trị tại địa chỉ lưu trong thanh ghi %eax = 4294966385.
+
+Ta có được 1 cặp 2 số có thể nhập là đáp số của bài này là: 1 và 4294966385. Với mỗi giá trị số thứ nhất khác (2, 3, 4) sẽ có giá trị của số thứ 2 khác.
+
+Với việc thử từng số từ 1 tới 4 thì ta có được 4 cặp số đáp án là:
+
+`[a, b] = [1, 4294966385], [2, 4294967020], [3, 4294966962], [4, 69]`
 
 ## Phase 4:
 
