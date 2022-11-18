@@ -613,9 +613,10 @@ Chuyển breakpoint tới sau dòng so sánh (dòng <+163>) và thực hiện l�
 
 Có được giá trị tại địa chỉ lưu trong thanh ghi %eax = 4294966385.
 
-Ta có được 1 cặp 2 số có thể nhập là đáp số của bài này là: 1 và 4294966385. Với mỗi giá trị số thứ nhất khác (2, 3, 4) sẽ có giá trị của số thứ 2 khác.
+**Kết luận:**
 
-Với việc thử từng số từ 1 tới 4 thì ta có được 4 cặp số đáp án là:
+- Ta có được 1 cặp 2 số có thể nhập là đáp số của bài này là: 1 và 4294966385. Với mỗi giá trị số thứ nhất khác (2, 3, 4) sẽ có giá trị của số thứ 2 khác.
+- Với việc thử từng số từ 1 tới 4 thì ta có được 4 cặp số đáp án là:
 
 `[a, b] = [1, 4294966385], [2, 4294967020], [3, 4294966962], [4, 69]`
 
