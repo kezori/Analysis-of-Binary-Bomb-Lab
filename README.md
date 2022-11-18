@@ -616,44 +616,115 @@ Có được giá trị tại địa chỉ lưu trong thanh ghi %eax = 429496638
 **Kết luận:**
 
 - Ta có được 1 cặp 2 số có thể nhập là đáp số của bài này là: 1 và 4294966385. Với mỗi giá trị số thứ nhất khác (2, 3, 4) sẽ có giá trị của số thứ 2 khác.
-- Với việc thử từng số từ 1 tới 4 thì ta có được 4 cặp số đáp án là:
+- Với việc thử từng số từ 1 tới 4 thì ta có được 4 cặp số đáp án của Phase 3 là:
 
 `[a, b] = [1, 4294966385], [2, 4294967020], [3, 4294966962], [4, 69]`
 
 ## Phase 4:
 
-```objdump
-000000000040100e <func4>:
-  40100e:	53                   	push   %rbx
-  40100f:	89 fb                	mov    %edi,%ebx
-  401011:	b8 01 00 00 00       	mov    $0x1,%eax
-  401016:	83 ff 01             	cmp    $0x1,%edi
-  401019:	7e 0b                	jle    401026 <func4+0x18>
-  40101b:	8d 7f ff             	lea    -0x1(%rdi),%edi
-  40101e:	e8 eb ff ff ff       	call   40100e <func4>
-  401023:	0f af c3             	imul   %ebx,%eax
-  401026:	5b                   	pop    %rbx
-  401027:	c3                   	ret
-
-0000000000401028 <phase_4>:
-  401028:	48 83 ec 18          	sub    $0x18,%rsp
-  40102c:	48 8d 54 24 0c       	lea    0xc(%rsp),%rdx
-  401031:	be 3d 1e 40 00       	mov    $0x401e3d,%esi
-  401036:	b8 00 00 00 00       	mov    $0x0,%eax
-  40103b:	e8 c0 fb ff ff       	call   400c00 <__isoc99_sscanf@plt>
-  401040:	83 f8 01             	cmp    $0x1,%eax
-  401043:	75 07                	jne    40104c <phase_4+0x24>
-  401045:	83 7c 24 0c 00       	cmpl   $0x0,0xc(%rsp)
-  40104a:	7f 05                	jg     401051 <phase_4+0x29>
-  40104c:	e8 62 06 00 00       	call   4016b3 <explode_bomb>
-  401051:	8b 7c 24 0c          	mov    0xc(%rsp),%edi
-  401055:	e8 b4 ff ff ff       	call   40100e <func4>
-  40105a:	83 f8 18             	cmp    $0x18,%eax
-  40105d:	74 05                	je     401064 <phase_4+0x3c>
-  40105f:	e8 4f 06 00 00       	call   4016b3 <explode_bomb>
-  401064:	48 83 c4 18          	add    $0x18,%rsp
-  401068:	c3                   	ret
+```assembly
+Dump of assembler code for function phase_4:
+=> 0x0000000000401028 <+0>:     sub    $0x18,%rsp ; mở rộng ngăn xếp 24 bytes tương đương với 6 hàng ô nhớ
+   0x000000000040102c <+4>:     lea    0xc(%rsp),%rdx
+   0x0000000000401031 <+9>:     mov    $0x401e3d,%esi ; input có dạng "%d"
+   0x0000000000401036 <+14>:    mov    $0x0,%eax ; đặt giá trị 0 cho thanh ghi %eax
+   0x000000000040103b <+19>:    call   0x400c00 <__isoc99_sscanf@plt>
+   0x0000000000401040 <+24>:    cmp    $0x1,%eax ; xác nhận đầu vào đúng dạng là 1 số nguyên không thì nhảy tới bomb dòng <+36>
+   0x0000000000401043 <+27>:    jne    0x40104c <phase_4+36>
+   0x0000000000401045 <+29>:    cmpl   $0x0,0xc(%rsp) ; 0x0 = 0
+   0x000000000040104a <+34>:    jg     0x401051 <phase_4+41> ; jg = jump if greater (nhảy nếu lớn hơn) so sánh số nhập vào với 0, lớn hơn sẽ chuyển qua dòng <+41>
+   0x000000000040104c <+36>:    call   0x4016b3 <explode_bomb>
+   0x0000000000401051 <+41>:    mov    0xc(%rsp),%edi ; chuyển giá trị nhập vào tại địa chỉ 0xc(%rsp) sang thanh ghi %edi
+   0x0000000000401055 <+45>:    call   0x40100e <func4>
+   0x000000000040105a <+50>:    cmp    $0x18,%eax ; %eax từ hàm <func4>
+   0x000000000040105d <+53>:    je     0x401064 <phase_4+60> ; so sánh %eax với 24, nếu bằng nhảy tới dòng <+60>
+   0x000000000040105f <+55>:    call   0x4016b3 <explode_bomb>
+   0x0000000000401064 <+60>:    add    $0x18,%rsp ; cân bằng stack
+   0x0000000000401068 <+64>:    ret
+End of assembler dump.
 ```
+
+Dễ nhận thấy được một sự quen thuộc so với phase 3.
+Ta tua nhanh các bước:
+
+- Cần biết được định dạng đáp án nhâp vào là gì? Ở đây lần này là một số nguyên
+
+```assembly
+   0x0000000000401031 <+9>:     mov    $0x401e3d,%esi
+   (gdb) x/s 0x401e3d
+   0x401e3d:       "%d"
+```
+
+- Nhập thử kết quả là 3 và chạy lại chương trình. Cần xác định số được nhập vào sẽ được lưu ở vị trí chứa ở thanh ghi nào? Đặt breakpoint ngay trước khi hàm `<func4>` được gọi và sử dụng lệnh `info register` để xem giá trị của thanh ghi %rsp + 0xc và nhận ra đây chính là địa chỉ có giá trị là số ta nhập vào
+
+```assembly
+(gdb) u*0x0000000000401051
+0x0000000000401031 in phase_4 ()
+(gdb) disas
+Dump of assembler code for function phase_4:
+   0x000000000040104c <+36>:    call   0x4016b3 <explode_bomb>
+=> 0x0000000000401051 <+41>:    mov    0xc(%rsp),%edi
+   0x0000000000401055 <+45>:    call   0x40100e <func4>
+
+   (gdb) x/d 0x7fffffffdee0 + 0xc
+   0x7fffffffdeec: 3
+```
+
+Khi này %edi chứa địa chỉ trỏ tới ô nhớ có địa chỉ là số ta nhập vào = 3
+Ta đi sâu hơn vào hàm `<func4>` để xem nó làm gì và đặc biệt quan tâm tới giá trị có địa chỉ lưu ở thanh ghi %eax sau khi hàm này được gọi
+
+```assembly
+(gdb) disas func4
+Dump of assembler code for function func4:
+   0x000000000040100e <+0>:     push   %rbx ; %edi lưu địa chỉ trỏ ô giá trị = 3 là số ta nhập vào
+   0x000000000040100f <+1>:     mov    %edi,%ebx ; chuyển giá trị 3 sang thanh ghi %ebx
+   0x0000000000401011 <+3>:     mov    $0x1,%eax ; đặt giá trị 1 cho thanh ghi %eax
+   0x0000000000401016 <+8>:     cmp    $0x1,%edi ; so sánh giá trị số ta nhập vào với 1
+   0x0000000000401019 <+11>:    jle    0x401026 <func4+24> ; jle = jump if less or equal (nhảy nếu nhỏ hơn hoặc bằng) nếu số ta nhập vào nhỏ hơn hoặc bằng 1 thì nhảy tới dòng <+24>
+   0x000000000040101b <+13>:    lea    -0x1(%rdi),%edi
+   0x000000000040101e <+16>:    call   0x40100e <func4>
+   0x0000000000401023 <+21>:    imul   %ebx,%eax ; nhân %eax với %ebx
+   0x0000000000401026 <+24>:    pop    %rbx
+   0x0000000000401027 <+25>:    ret
+```
+
+Số ta nhập vào nếu lớn hơn 1, phép di chuyển được thực hiện
+
+```assembly
+   0x000000000040101b <+13>:    lea    -0x1(%rdi),%edi ; giảm giá trị số ta nhập vào đi 1 và lưu vào thanh ghi %edi
+```
+
+Sau đó gọi lại chính hàm `<func4>` với giá trị mới của thanh ghi %edi. Điều này sẽ tiếp tục thực hiện cho đến khi giá trị có địa chỉ tại thanh ghi %edi bằng 1.
+Mỗi lần như vậy, giá trị có địa chỉ tại thanh ghi %eax sẽ được nhân với giá trị có địa chỉ tại thanh ghi %ebx. Và cuối cùng, giá trị của thanh ghi %eax sẽ là kết quả của hàm `<func4>`
+
+Giá trị có địa chỉ tại %ebx sẽ lần lượt có giá trị là 3, 2, 1. Và giá trị có địa chỉ tại %eax sẽ lần lượt có giá trị là 1, 3, 6.
+
+| %ebx | %eax | %eax-new |
+| ---- | ---- | -------- |
+| 3    | 1    | 3        |
+| 2    | 3    | 6        |
+| 1    | 6    | 6        |
+
+Vậy giá trị tại địa chỉ lưu trong thanh ghi %eax sau khi hàm `<func4>` được gọi là 6. Ta tiếp tục xem hàm `<phase_4>` tiếp tục thực hiện như thế nào
+
+```assembly
+   0x0000000000401055 <+45>:    call   0x40100e <func4>
+   0x000000000040105a <+50>:    cmp    $0x18,%eax ; so sánh giá trị tại địa chỉ lưu trong thanh ghi %eax với 24
+   0x000000000040105d <+53>:    je     0x401064 <phase_4+60> ; je = jump if equal (nhảy nếu bằng) nếu giá trị tại địa chỉ lưu trong thanh ghi %eax bằng 24 thì nhảy tới dòng <+60> không thì bomb nổ
+   0x000000000040105f <+55>:    call   0x4016b3 <explode_bomb>
+   0x0000000000401064 <+60>:    add    $0x18,%rsp
+   0x0000000000401068 <+64>:    ret
+```
+
+**Kết luận:**
+
+- Ta cần phải nhập vào 1 số để hàm `<func4>` trả về giá trị 24. Ta lập bảng và thử các số và được **đáp án là 4**.
+  | %ebx | %eax | %eax-new |
+  |------|------|----------|
+  | 4 | 1 | 4 |
+  | 3 | 4 | 12 |
+  | 2 | 12 | 24 |
+  | 1 | 24 | 24 |
 
 ## Phase 5:
 
