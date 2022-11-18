@@ -910,7 +910,8 @@ Sau hàng loạt lần chạy thử ta có bảng mã hóa như sau:
 | m | **_t_** | n | **_f_** | o | **_g_** |
 | p | **_i_** | q | **_s_** | r | **_r_** |
 | s | **_v_** | t | **_e_** | u | **_a_** |
-| v | **_w_** | z | **_p_** | | |
+| v | **_w_** | z | **_p_** | | | |
+
 Dựa vào bảng trên dễ dàng tìm ra chuỗi cần nhập vào là `opukmq`
 
 ```assembly
