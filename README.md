@@ -5,10 +5,12 @@
 ```
 Start working on 11/17/2022 - During the period of the final exam of the first term in 2022
 Please feel free to fork or star if helpful! (^^ゞ
-
 ```
 
-_The article is referenced from: [https:;john.coffee/pages/binary-bomb-lab](https:;john.coffee/pages/binary-bomb-lab)_
+_The article is referenced from:_
+
+- [john.coffee/pages/binary-bomb-lab](https:://john.coffee/pages/binary-bomb-lab)
+- [https://github.com/sc2225/Bomb-Lab](https://github.com/sc2225/Bomb-Lab)
 
 ## Overview / Tổng quan về giải bomb
 
@@ -180,8 +182,8 @@ Dump of assembler code for function phase_2:
    0x0000000000400f11 <+5>:     push   %rbx
    0x0000000000400f12 <+6>:     sub    $0x28,%rsp ; mở rộng ngăn xếp 56 bytes tương đương với 14 ngăn xếp 4 bytes
    0x0000000000400f16 <+10>:    mov    %rsp,%rsi ; lưu địa chỉ của thanh ghi %rsp vào thanh ghi %rsi
-   0x0000000000400f19 <+13>:    call   0x4016d5 <read_six_numbers> ; Chúng ta có thể thấy
-   0x0000000000400f1e <+18>:    mov    %rsp,%rbx ; lưu địa chỉ của thanh ghi %rsp vào thanh ghi %rbx
+   0x0000000000400f19 <+13>:    call   0x4016d5 <read_six_numbers> ; Chúng ta có thể thấy yêu cầu của phase này chính là nhập vào 6 số
+   0x0000000000400f1e <+18>:    mov    %rsp,%rbx ; lưu giá trị của thanh ghi %rsp (số thứ nhất) vào thanh ghi %rbx
    0x0000000000400f21 <+21>:    lea    0xc(%rsp),%r13 ; lưu giá trị của thanh ghi %rsp + 12 vào thanh ghi %r13
    0x0000000000400f26 <+26>:    mov    $0x0,%ebp ; lưu giá trị 0 vào thanh ghi %ebp
    0x0000000000400f2b <+31>:    mov    %rbx,%r12 ; lưu giá trị của thanh ghi %rbx vào thanh ghi %r12
@@ -203,6 +205,166 @@ Dump of assembler code for function phase_2:
    0x0000000000400f58 <+76>:    pop    %r13
    0x0000000000400f5a <+78>:    ret
 ```
+
+Nhập vào 6 số nguyên `1 2 3 4 5 6`và disas <read_six_number>:
+
+```assembly
+(gdb) disas read_six_numbers
+Dump of assembler code for function read_six_numbers:
+   0x00000000004016d5 <+0>:     sub    $0x18,%rsp // mở rộng ngăn xếp 24 bytes tương đương với 6 ngăn xếp 4 bytes
+   0x00000000004016d9 <+4>:     mov    %rsi,%rdx // lưu giá trị của thanh ghi %rsi vào thanh ghi %rdx
+   0x00000000004016dc <+7>:     lea    0x4(%rsi),%rcx // lưu giá trị của thanh ghi %rsi + 4 vào thanh ghi %rcx
+   0x00000000004016e0 <+11>:    lea    0x14(%rsi),%rax // lưu giá trị của thanh ghi %rsi + 20 vào thanh ghi %rax
+   0x00000000004016e4 <+15>:    mov    %rax,0x8(%rsp)
+   0x00000000004016e9 <+20>:    lea    0x10(%rsi),%rax
+   0x00000000004016ed <+24>:    mov    %rax,(%rsp)
+   0x00000000004016f1 <+28>:    lea    0xc(%rsi),%r9
+   0x00000000004016f5 <+32>:    lea    0x8(%rsi),%r8
+   0x00000000004016f9 <+36>:    mov    $0x401e2e,%esi // giá trị tại địa chỉ $0x401e2e được chuyển vào thanh ghi %esi được so sánh với chuỗi mà ta đưa vào ban đầu
+   0x00000000004016fe <+41>:    mov    $0x0,%eax
+   0x0000000000401703 <+46>:    call   0x400c00 <__isoc99_sscanf@plt>
+   0x0000000000401708 <+51>:    cmp    $0x5,%eax
+   0x000000000040170b <+54>:    jg     0x401712 <read_six_numbers+61> // nếu giá trị của thanh ghi %eax lớn hơn 5 thì bom không nổ
+   0x000000000040170d <+56>:    call   0x4016b3 <explode_bomb> // đặt breakpoint tại đây để bomb không nổ
+   0x0000000000401712 <+61>:    add    $0x18,%rsp
+   0x0000000000401716 <+65>:    ret
+```
+
+Chúng ta kiểm tra xem 0x401e2e có dạng như thế nào:
+
+```assembly
+(gdb) x/s 0x401e2e
+0x401e2e:       "%d %d %d %d %d %d"
+```
+
+Nhất định đó chính là dạng của câu trả lời ta đang cần tìm, chính là 6 số nguyên với khoảng trống ở giữa. Nhìn vào đoạn sau:
+
+```assembly
+   0x0000000000401708 <+51>:    cmp    $0x5,%eax
+   0x000000000040170b <+54>:    jg     0x401712 <read_six_numbers+61>
+   0x000000000040170d <+56>:    call   0x4016b3 <explode_bomb>
+```
+
+Chúng ta có thể thấy nó có thể so sánh định dạng đầu vào của chúng ta với định dạng trong thanh ghi %esi. Nếu chúng ta nhièu hơn 5 chữ số hay cụ thể là 6 thì chúng ta có thể vượt qua được việc gọi tới quả bom và định dạng đáp án là `%d %d %d %d %d %d`
+
+Hãy xem câu lệnh so sánh đang so sánh điều gì
+
+```assembly
+0x0000000000400f31 in phase_2 ()
+(gdb) disas
+Dump of assembler code for function phase_2:
+   0x0000000000400f0c <+0>:     push   %r13
+   0x0000000000400f0e <+2>:     push   %r12
+   0x0000000000400f10 <+4>:     push   %rbp
+   0x0000000000400f11 <+5>:     push   %rbx
+   0x0000000000400f12 <+6>:     sub    $0x28,%rsp
+   0x0000000000400f16 <+10>:    mov    %rsp,%rsi
+   0x0000000000400f19 <+13>:    call   0x4016d5 <read_six_numbers>
+   0x0000000000400f1e <+18>:    mov    %rsp,%rbx
+   0x0000000000400f21 <+21>:    lea    0xc(%rsp),%r13
+   0x0000000000400f26 <+26>:    mov    $0x0,%ebp
+   0x0000000000400f2b <+31>:    mov    %rbx,%r12
+   0x0000000000400f2e <+34>:    mov    0xc(%rbx),%eax
+=> 0x0000000000400f31 <+37>:    cmp    %eax,(%rbx)
+   0x0000000000400f33 <+39>:    je     0x400f3a <phase_2+46>
+   0x0000000000400f35 <+41>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f3a <+46>:    add    (%r12),%ebp
+   0x0000000000400f3e <+50>:    add    $0x4,%rbx
+   0x0000000000400f42 <+54>:    cmp    %r13,%rbx
+   0x0000000000400f45 <+57>:    jne    0x400f2b <phase_2+31>
+   0x0000000000400f47 <+59>:    test   %ebp,%ebp
+   0x0000000000400f49 <+61>:    jne    0x400f50 <phase_2+68>
+   0x0000000000400f4b <+63>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f50 <+68>:    add    $0x28,%rsp
+   0x0000000000400f54 <+72>:    pop    %rbx
+   0x0000000000400f55 <+73>:    pop    %rbp
+   0x0000000000400f56 <+74>:    pop    %r12
+   0x0000000000400f58 <+76>:    pop    %r13
+   0x0000000000400f5a <+78>:    ret
+--Type <RET> for more, q to quit, c to continue without paging--
+End of assembler dump.
+(gdb) i r
+rax            0x4                 4 // giá trị của thanh ghi %eax hay chính là giá trị của thanh ghi %rbx + 0xc (số thứ 4 nhập vào)
+rbx            0x7fffffffde80      140737488346752 // kiểm tra cái này
+rcx            0x7fffffffde70      140737488346736
+rdx            0x0                 0
+rsi            0x6                 6
+rdi            0x7fffffffd810      140737488345104
+rbp            0x0                 0x0
+rsp            0x7fffffffde80      0x7fffffffde80
+r8             0x1999999999999999  1844674407370955161
+r9             0x0                 0
+r10            0x7ffff7f47ac0      140737353382592
+r11            0x7ffff7f483c0      140737353384896
+r12            0x7fffffffde80      140737488346752
+r13            0x7fffffffde8c      140737488346764
+r14            0x0                 0
+r15            0x7ffff7ffd040      140737354125376
+```
+
+Chúng ta kiểm tra giá trị tại địa chỉ lưu trong thanh ghi rbx là bao nhiêu
+
+```assembly
+(gdb) x/d 140737488346752
+0x7fffffffde80: 1
+```
+
+Ta có 2 kết luận:
+
+- Giá trị của thanh ghi %eax hay chính là giá trị của thanh ghi %rbx + 0xc bằng 4, vậy tức là số thứ 4 nhập có địa chỉ nằm tại thanh ghi %rbx + 0xc
+  `0x0000000000400f2e <+34>: mov 0xc(%rbx),%eax`
+- Giá trị thanh ghi %rbx bằng 1 => thanh ghi %rsp lưu địa chỉ có giá trị số thứ 1 ta nhập vào
+  `0x0000000000400f1e <+18>: mov %rsp,%rbx`
+
+So sánh 2 số thứ 1 và 4 nhập vào nếu không bằng nhau sẽ nổ bom
+
+```assembly
+=> 0x0000000000400f31 <+37>:    cmp    %eax,(%rbx)
+   0x0000000000400f33 <+39>:    je     0x400f3a <phase_2+46>
+   0x0000000000400f35 <+41>:    call   0x4016b3 <explode_bomb>
+```
+
+Ta tiếp tục kiểm tra các dòng hợp ngữ phía sau:
+
+```assembly
+   0x0000000000400f3a <+46>:    add    (%r12),%ebp
+   0x0000000000400f3e <+50>:    add    $0x4,%rbx ; thanh ghi %rbx + 4 = địa chỉ của ô chứa giá trị số thứ 2 được nhập vào
+   0x0000000000400f42 <+54>:    cmp    %r13,%rbx ; so sánh giá trị số thứ 2 và số thứ 4
+   0x0000000000400f45 <+57>:    jne    0x400f2b <phase_2+31>
+   0x0000000000400f47 <+59>:    test   %ebp,%ebp
+   0x0000000000400f49 <+61>:    jne    0x400f50 <phase_2+68>
+   0x0000000000400f4b <+63>:    call   0x4016b3 <explode_bomb>
+   0x0000000000400f50 <+68>:    add    $0x28,%rsp
+   0x0000000000400f54 <+72>:    pop    %rbx
+   0x0000000000400f55 <+73>:    pop    %rbp
+   0x0000000000400f56 <+74>:    pop    %r12
+   0x0000000000400f58 <+76>:    pop    %r13
+   0x0000000000400f5a <+78>:    ret
+```
+
+`0x0000000000400f3e <+50>: add $0x4,%rbx`
+Địa chỉ thanh ghi %rbx được tăng thêm 4, chuyển tới trỏ vào ngăn xếp chứa giá trị thứ 2 được nhập vào
+
+`0x0000000000400f42 <+54>: cmp %r13,%rbx`
+Ta thấy số thứ 2 được so sánh với giá trị tại ô nhớ lưu ở %r13 hay chính là địa chỉ của ô nhớ %rsp + 0xc (+12 / tương đương 3 hàng, từ việc trỏ tới hàng thứ nhất di chuyển qua trỏ hàng thứ 4 trong ngăn xếp) (số thứ 4 nhập vào)
+
+So sánh 2 số thứ 2 và 4 nhập vào nếu không bằng nhau sẽ nhảy tới dòng 31
+`0x0000000000400f45 <+57>: jne 0x400f2b <phase_2+31>`
+
+```assembly
+   0x0000000000400f2b <+31>:    mov    %rbx,%r12 ; chuyển giá trị số thứ 2 vào thanh ghi %r12
+   0x0000000000400f2e <+34>:    mov    0xc(%rbx),%eax
+   0x0000000000400f31 <+37>:    cmp    %eax,(%rbx)
+```
+
+`0x0000000000400f2e <+34>: mov 0xc(%rbx),%eax`
+Di chuyển giá trị tại địa chỉ %rbx + 0xc (tương đương số thứ 5 nhập vào vì %rbx đang chứa địa chỉ trỏ vào số thứ 2) vào thanh ghi %eax
+
+`0x0000000000400f31 <+37>: cmp %eax,(%rbx)`
+Lúc này so sánh giá trị tại 2 thanh ghi %eax và %rbx (tương đương số thứ 5 và số thứ 2 nhập vào)
+
+Cứ tiếp tục như vậy, chúng ta sẽ so sánh các số thứ 3 và số thứ 5, không bằng nhau và chuyển về dòng 31 tiếp tục so sánh số thứ 4 và số thứ 6.
+Dễ thấy thanh ghi %rbx sẽ giữ địa chỉ có giá trị từng số mà ta nhập vào,
 
 ## Phase 3:
 
