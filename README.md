@@ -212,21 +212,21 @@ Nhập vào 6 số nguyên `1 2 3 4 5 6`và disas <read_six_number>:
 ```assembly
 (gdb) disas read_six_numbers
 Dump of assembler code for function read_six_numbers:
-   0x00000000004016d5 <+0>:     sub    $0x18,%rsp // mở rộng ngăn xếp 24 bytes tương đương với 6 ngăn xếp 4 bytes
-   0x00000000004016d9 <+4>:     mov    %rsi,%rdx // lưu giá trị của thanh ghi %rsi vào thanh ghi %rdx
-   0x00000000004016dc <+7>:     lea    0x4(%rsi),%rcx // lưu giá trị của thanh ghi %rsi + 4 vào thanh ghi %rcx
-   0x00000000004016e0 <+11>:    lea    0x14(%rsi),%rax // lưu giá trị của thanh ghi %rsi + 20 vào thanh ghi %rax
+   0x00000000004016d5 <+0>:     sub    $0x18,%rsp ; mở rộng ngăn xếp 24 bytes tương đương với 6 ngăn xếp 4 bytes
+   0x00000000004016d9 <+4>:     mov    %rsi,%rdx ; lưu giá trị của thanh ghi %rsi vào thanh ghi %rdx
+   0x00000000004016dc <+7>:     lea    0x4(%rsi),%rcx ; lưu giá trị của thanh ghi %rsi + 4 vào thanh ghi %rcx
+   0x00000000004016e0 <+11>:    lea    0x14(%rsi),%rax ; lưu giá trị của thanh ghi %rsi + 20 vào thanh ghi %rax
    0x00000000004016e4 <+15>:    mov    %rax,0x8(%rsp)
    0x00000000004016e9 <+20>:    lea    0x10(%rsi),%rax
    0x00000000004016ed <+24>:    mov    %rax,(%rsp)
    0x00000000004016f1 <+28>:    lea    0xc(%rsi),%r9
    0x00000000004016f5 <+32>:    lea    0x8(%rsi),%r8
-   0x00000000004016f9 <+36>:    mov    $0x401e2e,%esi // giá trị tại địa chỉ $0x401e2e được chuyển vào thanh ghi %esi được so sánh với chuỗi mà ta đưa vào ban đầu
+   0x00000000004016f9 <+36>:    mov    $0x401e2e,%esi ; giá trị tại địa chỉ $0x401e2e được chuyển vào thanh ghi %esi được so sánh với chuỗi mà ta đưa vào ban đầu
    0x00000000004016fe <+41>:    mov    $0x0,%eax
    0x0000000000401703 <+46>:    call   0x400c00 <__isoc99_sscanf@plt>
    0x0000000000401708 <+51>:    cmp    $0x5,%eax
-   0x000000000040170b <+54>:    jg     0x401712 <read_six_numbers+61> // nếu giá trị của thanh ghi %eax lớn hơn 5 thì bom không nổ
-   0x000000000040170d <+56>:    call   0x4016b3 <explode_bomb> // đặt breakpoint tại đây để bomb không nổ
+   0x000000000040170b <+54>:    jg     0x401712 <read_six_numbers+61> ; nếu giá trị của thanh ghi %eax lớn hơn 5 thì bom không nổ
+   0x000000000040170d <+56>:    call   0x4016b3 <explode_bomb> ; đặt breakpoint tại đây để bomb không nổ
    0x0000000000401712 <+61>:    add    $0x18,%rsp
    0x0000000000401716 <+65>:    ret
 ```
@@ -285,8 +285,8 @@ Dump of assembler code for function phase_2:
 --Type <RET> for more, q to quit, c to continue without paging--
 End of assembler dump.
 (gdb) i r
-rax            0x4                 4 // giá trị của thanh ghi %eax hay chính là giá trị của thanh ghi %rbx + 0xc (số thứ 4 nhập vào)
-rbx            0x7fffffffde80      140737488346752 // kiểm tra cái này
+rax            0x4                 4 ; giá trị của thanh ghi %eax hay chính là giá trị của thanh ghi %rbx + 0xc (số thứ 4 nhập vào)
+rbx            0x7fffffffde80      140737488346752 ; kiểm tra cái này
 rcx            0x7fffffffde70      140737488346736
 rdx            0x0                 0
 rsi            0x6                 6
