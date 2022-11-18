@@ -695,7 +695,7 @@ Số ta nhập vào nếu lớn hơn 1, phép di chuyển được thực hiện
 ```
 
 Sau đó gọi lại chính hàm `<func4>` với giá trị mới của thanh ghi %edi. Điều này sẽ tiếp tục thực hiện cho đến khi giá trị có địa chỉ tại thanh ghi %edi bằng 1.
-Mỗi lần như vậy, giá trị có địa chỉ tại thanh ghi %eax sẽ được nhân với giá trị có địa chỉ tại thanh ghi %ebx. Và cuối cùng, giá trị của thanh ghi %eax sẽ là kết quả của hàm `<func4>`
+Mỗi lần như vậy, giá trị có địa chỉ tại thanh ghi %eax sẽ được nhân với giá trị có địa chỉ tại thanh ghi %ebx. Và cuối cùng, giá trị có địa chỉ tại thanh ghi %eax sẽ là kết quả của hàm `<func4>`
 
 Giá trị có địa chỉ tại %ebx sẽ lần lượt có giá trị là 3, 2, 1. Và giá trị có địa chỉ tại %eax sẽ lần lượt có giá trị là 1, 3, 6.
 
@@ -704,6 +704,12 @@ Giá trị có địa chỉ tại %ebx sẽ lần lượt có giá trị là 3, 
 | 3    | 1    | 3        |
 | 2    | 3    | 6        |
 | 1    | 6    | 6        |
+
+Dễ thấy được công thức của hàm `<func4>` là
+
+```math
+f(x) = x! = x * (x - 1) * (x - 2) * ... * 1
+```
 
 Vậy giá trị tại địa chỉ lưu trong thanh ghi %eax sau khi hàm `<func4>` được gọi là 6. Ta tiếp tục xem hàm `<phase_4>` tiếp tục thực hiện như thế nào
 
@@ -717,14 +723,13 @@ Vậy giá trị tại địa chỉ lưu trong thanh ghi %eax sau khi hàm `<fun
 ```
 
 **Kết luận:**
-
-- Ta cần phải nhập vào 1 số để hàm `<func4>` trả về giá trị 24. Ta lập bảng và thử các số và được **đáp án là 4**.
-  | %ebx | %eax | %eax-new |
-  |------|------|----------|
-  | 4 | 1 | 4 |
-  | 3 | 4 | 12 |
-  | 2 | 12 | 24 |
-  | 1 | 24 | 24 |
+Ta cần phải nhập vào 1 số để hàm `<func4>` trả về giá trị 24. Dựa vào công thức ở trên ta tìm được **đáp án là 4**.
+| %ebx | %eax | %eax-new |
+|------|------|----------|
+| 4 | 1 | 4 |
+| 3 | 4 | 12 |
+| 2 | 12 | 24 |
+| 1 | 24 | 24 |
 
 ## Phase 5:
 
