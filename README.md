@@ -5,7 +5,6 @@
 ```
 Start working on 11/17/2022 - During the period of the final exam of the first term in 2022
 Please feel free to fork or star if helpful! (^^ゞ
-Created by: A41316 - Nguyễn Hữu Khoa
 ```
 
 _The article is referenced from:_
